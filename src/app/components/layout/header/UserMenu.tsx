@@ -1,7 +1,7 @@
 "use client"
 
 import {useRouter} from "next/navigation"
-import {ChevronDown, LogOut, Sun, Moon, User as UserIcon} from "lucide-react"
+import {ChevronDown, ChevronsUpDown, LogOut, Sun, Moon, User as UserIcon} from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -54,7 +54,7 @@ export function UserMenu({variant = "header"}: {variant?: "header" | "rail"}) {
             suppressHydrationWarning
             className={cn(
               "hover:bg-muted/50 flex items-center gap-2 rounded-md px-1.5 py-1 transition-colors md:px-2",
-              rail && "rounded-full p-0.5 md:px-0.5"
+              rail && "border-border bg-muted/40 hover:bg-muted/70 w-full gap-3 rounded-xl border p-2 md:px-2"
             )}
           />
         }
@@ -62,11 +62,22 @@ export function UserMenu({variant = "header"}: {variant?: "header" | "rail"}) {
         <span
           className={cn(
             "flex size-9 shrink-0 items-center justify-center rounded-full bg-indigo-500 text-sm font-semibold text-white",
-            rail && "size-11 text-base"
+            rail && "size-10 text-[15px]"
           )}
         >
           {getInitials(name)}
         </span>
+        {rail && (
+          <>
+            <div className="flex min-w-0 flex-1 flex-col items-start text-left">
+              <span className="w-full truncate text-sm leading-tight font-semibold">{name}</span>
+              {user?.email && (
+                <span className="text-muted-foreground w-full truncate text-xs leading-tight">{user.email}</span>
+              )}
+            </div>
+            <ChevronsUpDown className="text-muted-foreground size-4 shrink-0" />
+          </>
+        )}
         {!rail && (
           <>
             <div className="hidden min-w-0 flex-col items-start md:flex">

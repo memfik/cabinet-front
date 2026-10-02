@@ -4,6 +4,7 @@ import {useEffect} from "react"
 import {Header} from "./Header"
 import {BottomNav} from "./BottomNav"
 import {Sidebar} from "./Sidebar"
+import {RightBar} from "./RightBar"
 import {useProfileStore} from "@/lib/stores/profileStore"
 
 /**
@@ -31,6 +32,7 @@ export function ClientShell({children}: {children: React.ReactNode}) {
           <BottomNav />
         </div>
       </div>
+      <RightBar />
     </div>
   )
 }
