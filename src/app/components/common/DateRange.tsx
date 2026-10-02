@@ -1,0 +1,80 @@
+"use client"
+
+import {Input} from "@/components/ui/input"
+import {daysAgoInput, toDateInput} from "@/lib/format"
+import {cn} from "@/lib/utils"
+import {Field} from "./Field"
+
+/**
+ * Пара полей «с … по …» (`YYYY-MM-DD`). На мобильном — два поля в ряд на всю ширину.
+ * `presets` — быстрые периоды в днях («последние 30 дней»): чипы над полями, активный подсвечивается.
+ */
+export function DateRange({
+  from,
+  to,
+  onChange,
+  error,
+  presets,
+}: {
+  from: string
+  to: string
+  onChange: (range: {from: string; to: string}) => void
+  error?: string
+  presets?: number[]
+}) {
+  const today = toDateInput(new Date())
+
+  return (
+    <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end sm:gap-x-5 sm:gap-y-3">
+      {presets && (
+        <div className="bg-muted flex gap-1 rounded-lg p-1 sm:order-last sm:ml-auto">
+          {presets.map((days) => {
+            // «N дн.» — N календарных дней включительно, чтобы 30 и 90 не превышали лимит бэка
+            const start = daysAgoInput(days - 1)
+            const active = to === today && from === start
+            return (
+              <button
+                key={days}
+                type="button"
+                onClick={() => onChange({from: start, to: today})}
+                aria-pressed={active}
+                className={cn(
+                  "h-9 flex-1 rounded-md px-4 text-sm font-medium transition-all sm:flex-none",
+                  active
+                    ? "bg-background text-brand shadow-sm"
+                    : "text-muted-foreground hover:bg-background/60 hover:text-foreground"
+                )}
+              >
+                {days} дн.
+              </button>
+            )
+          })}
+        </div>
+      )}
+
+      <div className="grid grid-cols-2 gap-3 sm:flex sm:items-end sm:gap-2">
+        <Field label="С">
+          <Input
+            type="date"
+            value={from}
+            max={to || undefined}
+            onChange={(e) => onChange({from: e.target.value, to})}
+            className="h-11 w-full min-w-0 sm:w-44"
+          />
+        </Field>
+        <span className="text-muted-foreground hidden h-11 items-center sm:flex">—</span>
+        <Field label="По">
+          <Input
+            type="date"
+            value={to}
+            min={from || undefined}
+            onChange={(e) => onChange({from, to: e.target.value})}
+            className="h-11 w-full min-w-0 sm:w-44"
+          />
+        </Field>
+      </div>
+
+      {error && <p className="text-destructive text-xs sm:basis-full">{error}</p>}
+    </div>
+  )
+}

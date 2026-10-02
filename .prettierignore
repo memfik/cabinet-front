@@ -1,0 +1,9 @@
+node_modules
+.next
+public
+.gitignore
+.nvmrc
+.env
+.env.*
+**/*.d.ts
+src/lib/api
