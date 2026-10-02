@@ -9,6 +9,7 @@ import {Textarea} from "@/components/ui/textarea"
 import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "@/components/ui/dialog"
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs"
 import {Page, Card} from "@/app/components/common/Page"
+import {LottieAnimation} from "@/app/components/common/LottieAnimation"
 import {ErrorState, Skeleton} from "@/app/components/common/States"
 import {Field, SelectField, type Option} from "@/app/components/common/Field"
 import {Badge} from "@/app/components/common/Badge"
@@ -52,6 +53,7 @@ export default function RequestsPage() {
     <Page
       title="Заявления"
       description="Запрос документов, изменение настроек и отключение услуг. Заявление уходит сотрудникам письмом."
+      illustration={<LottieAnimation src="/videos/application.json" className="h-44 w-64" />}
     >
       {loading && !options ? (
         <Card className="space-y-4 p-6">

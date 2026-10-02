@@ -5,12 +5,15 @@ export function Page({
   title,
   description,
   actions,
+  illustration,
   children,
   className,
 }: {
   title: string
   description?: React.ReactNode
   actions?: React.ReactNode
+  /** Декоративная картинка/анимация справа в плашке, только на широких экранах. */
+  illustration?: React.ReactNode
   children: React.ReactNode
   className?: string
 }) {
@@ -25,6 +28,7 @@ export function Page({
             {description && <p className="text-muted-foreground mt-1.5 text-base">{description}</p>}
           </div>
           {actions && <div className="flex w-full shrink-0 flex-wrap items-center gap-2 sm:w-auto">{actions}</div>}
+          {illustration && <div className="pointer-events-none -my-6 hidden shrink-0 md:block">{illustration}</div>}
         </div>
       </div>
       {children}

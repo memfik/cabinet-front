@@ -3,6 +3,7 @@
 import {useState} from "react"
 import {Wallet} from "lucide-react"
 import {Page, Card, CardHeader} from "@/app/components/common/Page"
+import {LottieAnimation} from "@/app/components/common/LottieAnimation"
 import {DateRange} from "@/app/components/common/DateRange"
 import {EmptyState, ErrorState, ListSkeleton} from "@/app/components/common/States"
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table"
@@ -20,7 +21,11 @@ export default function PaymentsPage() {
     error?.status === 422 ? (error.errors.from?.[0] ?? error.errors.to?.[0] ?? error.message) : undefined
 
   return (
-    <Page title="Платежи" description="Зачисления на лицевой счёт. Период — не более 90 дней.">
+    <Page
+      title="Платежи"
+      description="Зачисления на лицевой счёт. Период — не более 90 дней."
+      illustration={<LottieAnimation src="/videos/payment.json" className="h-44 w-64" />}
+    >
       <Card className="mb-4 p-4">
         <DateRange {...range} onChange={setRange} error={rangeError} presets={[7, 30, 90]} />
       </Card>
@@ -79,7 +84,7 @@ export default function PaymentsPage() {
             {/* < md — карточки */}
             <ul className="divide-border divide-y md:hidden">
               {data.payments.map((p) => (
-                <li key={p.bill_id} className="px-5 py-3.5">
+                <li key={p.bill_id} className="px-5 py-4">
                   <div className="flex items-baseline justify-between gap-3">
                     <span className="font-semibold tabular-nums">{formatMoney(p.amount)}</span>
                     <span className="text-muted-foreground text-xs">{formatDateTime(p.credited_at)}</span>

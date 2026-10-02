@@ -154,7 +154,7 @@ export default function TicketsPage() {
             <ul className="divide-border divide-y md:hidden">
               {tickets.map((t) => (
                 <li key={t.id}>
-                  <Link href={`/tickets/${t.id}`} className="hover:bg-muted/40 flex flex-col gap-1.5 px-4 py-3.5">
+                  <Link href={`/tickets/${t.id}`} className="hover:bg-muted/40 flex flex-col gap-1.5 px-5 py-4">
                     <div className="flex items-center justify-between gap-2">
                       <span className="text-brand text-sm font-semibold">{t.number}</span>
                       <TicketStatusBadge status={t.status} />

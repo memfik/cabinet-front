@@ -3,6 +3,7 @@
 import {useState} from "react"
 import {Infinity as InfinityIcon, Satellite} from "lucide-react"
 import {Page, Card, CardHeader} from "@/app/components/common/Page"
+import {LottieAnimation} from "@/app/components/common/LottieAnimation"
 import {Badge} from "@/app/components/common/Badge"
 import {EmptyState, ErrorState, Skeleton} from "@/app/components/common/States"
 import {Field} from "@/app/components/common/Field"
@@ -28,7 +29,11 @@ export default function OneWebPage() {
   )
 
   return (
-    <Page title="OneWeb" description="Спутниковый интернет: тариф и остаток трафика">
+    <Page
+      title="OneWeb"
+      description="Спутниковый интернет: тариф и остаток трафика"
+      illustration={<LottieAnimation src="/videos/satellite.json" className="h-44 w-64" />}
+    >
       {products.error ? (
         <Card>
           <ErrorState error={products.error} onRetry={products.reload} />

@@ -4,6 +4,7 @@ import {useState} from "react"
 import {Download, FileText, Loader2} from "lucide-react"
 import {toast} from "sonner"
 import {Page, Card, CardHeader} from "@/app/components/common/Page"
+import {LottieAnimation} from "@/app/components/common/LottieAnimation"
 import {Badge, type Tone} from "@/app/components/common/Badge"
 import {EmptyState, ErrorState, ListSkeleton} from "@/app/components/common/States"
 import {Button} from "@/components/ui/button"
@@ -44,7 +45,11 @@ export default function InvoicesPage() {
   )
 
   return (
-    <Page title="Документы" description="Счета и счета-фактуры с начала текущего года">
+    <Page
+      title="Документы"
+      description="Счета и счета-фактуры с начала текущего года"
+      illustration={<LottieAnimation src="/videos/documents.json" className="h-44 w-64" />}
+    >
       <Card>
         <CardHeader title="Документы" />
         {error ? (
@@ -99,7 +104,7 @@ export default function InvoicesPage() {
             </div>
             <ul className="divide-border divide-y md:hidden">
               {data.map((inv) => (
-                <li key={inv.id} className="flex items-center gap-3 px-5 py-3.5">
+                <li key={inv.id} className="flex items-center gap-3 px-5 py-4">
                   <div className="min-w-0 flex-1">
                     <p className="font-medium">№ {inv.number}</p>
                     <p className="text-muted-foreground text-xs">

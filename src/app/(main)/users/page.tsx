@@ -92,7 +92,7 @@ export default function UsersPage() {
             {/* Мобильная раскладка: карточки */}
             <div className="divide-border divide-y md:hidden">
               {users.map((u) => (
-                <div key={u.id} className="flex items-start justify-between gap-3 p-4">
+                <div key={u.id} className="flex items-start justify-between gap-3 px-5 py-4">
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="font-medium">{fullName(u)}</span>

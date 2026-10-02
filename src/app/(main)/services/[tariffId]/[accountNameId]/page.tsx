@@ -89,7 +89,7 @@ export default function CallsPage() {
             </div>
             <ul className="divide-border divide-y md:hidden">
               {data.calls.map((c, i) => (
-                <li key={i} className="px-5 py-3.5">
+                <li key={i} className="px-5 py-4">
                   <div className="flex items-baseline justify-between gap-3">
                     <span className="font-medium">{c.called_number}</span>
                     <span className="font-semibold tabular-nums">{formatMoney(c.cost)}</span>

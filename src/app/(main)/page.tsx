@@ -3,6 +3,7 @@
 import Link from "next/link"
 import {ArrowRight, BarChart3, Building2, FileText, Globe, Headset, Phone, Send, UserRound, Wallet} from "lucide-react"
 import {Page, Card, CardHeader} from "@/app/components/common/Page"
+import {LottieAnimation} from "@/app/components/common/LottieAnimation"
 import {EmptyState, ErrorState, Skeleton} from "@/app/components/common/States"
 import {Badge} from "@/app/components/common/Badge"
 import {buttonVariants} from "@/components/ui/button"
@@ -34,6 +35,7 @@ export default function Home() {
     <Page
       title={user?.first_name ? `Здравствуйте, ${user.first_name}!` : "Личный кабинет"}
       description="Сводка по вашему договору"
+      illustration={<LottieAnimation src="/videos/welcome.json" className="h-44 w-64" />}
     >
       {error && !data ? (
         <Card>
