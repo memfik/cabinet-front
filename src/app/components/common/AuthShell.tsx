@@ -2,6 +2,8 @@
 
 import {Sun, Moon} from "lucide-react"
 import {useAppTheme} from "@/app/components/layout/ThemeContext"
+import {useI18n} from "@/i18n"
+import {LanguageSwitcher} from "@/i18n/ui/LanguageSwitcher"
 import {cn} from "@/lib/utils"
 
 /**
@@ -10,6 +12,7 @@ import {cn} from "@/lib/utils"
  */
 export function AuthShell({title, subtitle, children}: {title: string; subtitle?: string; children: React.ReactNode}) {
   const {isDark, toggleTheme} = useAppTheme()
+  const {t} = useI18n()
 
   return (
     <div className="relative flex h-screen overflow-hidden">
@@ -21,11 +24,12 @@ export function AuthShell({title, subtitle, children}: {title: string; subtitle?
       </div>
 
       <div className="relative flex flex-1 items-center justify-center overflow-y-auto px-6 py-8 sm:px-12 lg:px-16">
+        <LanguageSwitcher variant="compact" className="absolute top-4 left-4 z-10" />
         <button
           type="button"
           onClick={(e) => toggleTheme(e)}
           className="text-muted-foreground hover:text-foreground absolute top-4 right-4 flex items-center gap-2 text-sm transition-colors"
-          aria-label="Сменить тему"
+          aria-label={t("auth.toggleTheme")}
         >
           {isDark ? <Sun className="size-6 text-yellow-400" /> : <Moon className="size-6" />}
           <div
@@ -45,7 +49,11 @@ export function AuthShell({title, subtitle, children}: {title: string; subtitle?
 
         <div className="sm:bg-card/60 sm:border-border/60 sm:dark:bg-card/40 w-full max-w-md sm:rounded-3xl sm:border sm:p-12 sm:shadow-2xl sm:shadow-black/10 sm:backdrop-blur-xl sm:dark:shadow-black/40">
           <div className="mb-10 flex justify-center">
-            <img src={isDark ? "/logo-white.png" : "/logo-black.png"} alt="Logo" className="h-14 object-contain" />
+            <img
+              src={isDark ? "/logo-white.png" : "/logo-black.png"}
+              alt={t("auth.logoAlt")}
+              className="h-14 object-contain"
+            />
           </div>
           <h1 className="mb-1.5 text-center text-2xl font-bold">{title}</h1>
           {subtitle && <p className="text-muted-foreground mb-10 text-center text-[15px]">{subtitle}</p>}

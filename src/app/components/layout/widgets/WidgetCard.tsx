@@ -1,6 +1,7 @@
 "use client"
 
 import {RefreshCw} from "lucide-react"
+import {useI18n} from "@/i18n"
 import {cn} from "@/lib/utils"
 import {Skeleton} from "../../common/States"
 
@@ -29,6 +30,7 @@ export function WidgetCard({
   className?: string
   children?: React.ReactNode
 }) {
+  const {t} = useI18n()
   return (
     <section className={cn("bg-card border-border shrink-0 rounded-2xl border p-4 shadow-md", className)}>
       <div className="mb-3 flex items-center justify-between gap-2">
@@ -40,7 +42,7 @@ export function WidgetCard({
           <button
             onClick={onReload}
             disabled={refreshing}
-            aria-label="Обновить"
+            aria-label={t("widgets.refresh")}
             className="text-muted-foreground hover:bg-muted/60 hover:text-foreground rounded-md p-1 transition-colors disabled:pointer-events-none"
           >
             <RefreshCw className={cn("size-3.5", refreshing && "animate-spin")} />
@@ -58,9 +60,7 @@ export function WidgetCard({
       ) : (
         <>
           {children}
-          {staleError && !refreshing && (
-            <p className="text-destructive mt-3 text-[11px]">Не удалось обновить, показаны прежние данные</p>
-          )}
+          {staleError && !refreshing && <p className="text-destructive mt-3 text-[11px]">{t("widgets.staleError")}</p>}
         </>
       )}
     </section>

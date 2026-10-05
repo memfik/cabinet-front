@@ -11,6 +11,7 @@ import {EmptyState, ErrorState, ListSkeleton} from "@/app/components/common/Stat
 import {Field} from "@/app/components/common/Field"
 import {Badge} from "@/app/components/common/Badge"
 import {ErrorBanner, NO_ERROR, firstError, handleFormError, type FormError} from "@/app/components/common/formError"
+import {useI18n} from "@/i18n"
 import {useApi} from "@/lib/hooks/useApi"
 import {parseApiError} from "@/lib/api/errors"
 import {subUsersApi} from "@/lib/api/subUsers"
@@ -20,6 +21,7 @@ const fullName = (u: User) => [u.first_name, u.last_name].filter(Boolean).join("
 
 /** Субпользователи договора. Раздел доступен только менеджерам (`is_user_manager`), иначе бэк отвечает 403. */
 export default function UsersPage() {
+  const {t} = useI18n()
   const {data: users, error, loading, reload} = useApi(() => subUsersApi.list())
   // undefined — диалог закрыт, null — создание, User — редактирование
   const [editing, setEditing] = useState<User | null | undefined>(undefined)
@@ -29,12 +31,12 @@ export default function UsersPage() {
 
   return (
     <Page
-      title="Пользователи"
-      description="Сотрудники, у которых есть доступ к кабинету по вашему лицевому счёту."
+      title={t("users.title")}
+      description={t("users.description")}
       actions={
         !forbidden && (
           <Button className="bg-brand hover:bg-brand/90 h-10 px-4 text-white" onClick={() => setEditing(null)}>
-            <Plus /> Добавить
+            <Plus /> {t("users.add")}
           </Button>
         )
       }
@@ -52,16 +54,13 @@ export default function UsersPage() {
           ) : forbidden ? (
             <EmptyState
               icon={ShieldOff}
-              title="Нет доступа"
-              description="Управлять пользователями могут только менеджеры. Обратитесь к владельцу договора."
+              title={t("users.noAccessTitle")}
+              description={t("users.noAccessDescription")}
             />
           ) : error && !users ? (
             <ErrorState error={error} onRetry={reload} />
           ) : (
-            <EmptyState
-              title="Пользователей пока нет"
-              description="Добавьте сотрудника, чтобы он мог входить в кабинет."
-            />
+            <EmptyState title={t("users.emptyTitle")} description={t("users.emptyDescription")} />
           )}
         </Card>
       )}
@@ -88,8 +87,13 @@ export default function UsersPage() {
 
 /** Карточка пользователя: аватар с инициалами, имя, должность и email. */
 function UserCard({user, onEdit, onDelete}: {user: User; onEdit: () => void; onDelete: () => void}) {
+  const {t} = useI18n()
   const name = fullName(user)
-  const initials = (name !== "—" ? name : user.email).split(/\s+/).slice(0, 2).map((w) => w[0]?.toUpperCase()).join("")
+  const initials = (name !== "—" ? name : user.email)
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((w) => w[0]?.toUpperCase())
+    .join("")
 
   return (
     <Card className="flex flex-col gap-3 p-5 shadow-sm">
@@ -99,12 +103,12 @@ function UserCard({user, onEdit, onDelete}: {user: User; onEdit: () => void; onD
         </div>
         <div className="min-w-0 flex-1">
           <p className="truncate font-semibold">{name !== "—" ? name : user.email}</p>
-          <p className="text-muted-foreground truncate text-sm">{user.position ?? "Должность не указана"}</p>
+          <p className="text-muted-foreground truncate text-sm">{user.position ?? t("users.noPosition")}</p>
         </div>
       </div>
       <div className="border-border flex flex-wrap items-center justify-between gap-2 border-t pt-3">
         <span className="text-muted-foreground min-w-0 truncate text-sm">{user.email}</span>
-        {user.is_user_manager && <Badge tone="brand">Менеджер</Badge>}
+        {user.is_user_manager && <Badge tone="brand">{t("users.manager")}</Badge>}
       </div>
       <RowActions user={user} onEdit={onEdit} onDelete={onDelete} />
     </Card>
@@ -113,12 +117,13 @@ function UserCard({user, onEdit, onDelete}: {user: User; onEdit: () => void; onD
 
 /** Кнопки показываются по правам текущего пользователя на запись. */
 function RowActions({user, onEdit, onDelete}: {user: User; onEdit: () => void; onDelete: () => void}) {
+  const {t} = useI18n()
   if (!user.permissions.update && !user.permissions.delete) return null
   return (
     <div className="flex gap-2">
       {user.permissions.update && (
         <Button variant="outline" className="h-11 flex-1 text-[15px]" onClick={onEdit}>
-          <Pencil /> Изменить
+          <Pencil /> {t("users.edit")}
         </Button>
       )}
       {user.permissions.delete && (
@@ -127,7 +132,7 @@ function RowActions({user, onEdit, onDelete}: {user: User; onEdit: () => void; o
           className="text-destructive hover:text-destructive h-11 flex-1 text-[15px]"
           onClick={onDelete}
         >
-          <Trash2 /> Удалить
+          <Trash2 /> {t("users.delete")}
         </Button>
       )}
     </div>
@@ -157,6 +162,7 @@ function UserDialog({
 }
 
 function UserForm({user, onClose, onSaved}: {user: User | null; onClose: () => void; onSaved: () => void}) {
+  const {t} = useI18n()
   const isEdit = !!user
   const [email, setEmail] = useState(user?.email ?? "")
   const [password, setPassword] = useState("")
@@ -184,7 +190,7 @@ function UserForm({user, onClose, onSaved}: {user: User | null; onClose: () => v
     try {
       if (user) await subUsersApi.update(user.id, payload)
       else await subUsersApi.create(payload)
-      toast.success(isEdit ? "Изменения сохранены" : "Пользователь добавлен")
+      toast.success(isEdit ? t("users.saved") : t("users.added"))
       onSaved()
     } catch (e) {
       setErr(handleFormError(e))
@@ -196,19 +202,17 @@ function UserForm({user, onClose, onSaved}: {user: User | null; onClose: () => v
   return (
     <form onSubmit={submit} className="grid gap-4">
       <DialogHeader>
-        <DialogTitle>{isEdit ? "Изменить пользователя" : "Новый пользователь"}</DialogTitle>
-        <DialogDescription>
-          {isEdit ? "Оставьте пароль пустым, чтобы не менять его." : "Email станет логином для входа в кабинет."}
-        </DialogDescription>
+        <DialogTitle>{isEdit ? t("users.editTitle") : t("users.newTitle")}</DialogTitle>
+        <DialogDescription>{isEdit ? t("users.editHint") : t("users.newHint")}</DialogDescription>
       </DialogHeader>
 
       <ErrorBanner message={err.banner} />
 
       <Field
-        label="Email"
+        label={t("users.emailLabel")}
         required
         error={firstError(err, "email")}
-        hint={isEdit ? undefined : "Не длиннее 32 символов"}
+        hint={isEdit ? undefined : t("users.emailMaxHint")}
       >
         <Input
           type="email"
@@ -219,21 +223,21 @@ function UserForm({user, onClose, onSaved}: {user: User | null; onClose: () => v
         />
       </Field>
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Имя" error={firstError(err, "first_name")}>
+        <Field label={t("users.firstName")} error={firstError(err, "first_name")}>
           <Input value={firstName} onChange={(e) => setFirstName(e.target.value)} maxLength={50} />
         </Field>
-        <Field label="Фамилия" error={firstError(err, "last_name")}>
+        <Field label={t("users.lastName")} error={firstError(err, "last_name")}>
           <Input value={lastName} onChange={(e) => setLastName(e.target.value)} maxLength={50} />
         </Field>
       </div>
-      <Field label="Должность" error={firstError(err, "position")}>
+      <Field label={t("users.position")} error={firstError(err, "position")}>
         <Input value={position} onChange={(e) => setPosition(e.target.value)} maxLength={255} />
       </Field>
       <div className="grid gap-4 sm:grid-cols-2">
         <Field
-          label="Пароль"
+          label={t("users.password")}
           error={firstError(err, "password")}
-          hint={isEdit ? undefined : "Не указан — будет сгенерирован и отправлен на email"}
+          hint={isEdit ? undefined : t("users.passwordHint")}
         >
           <Input
             type="password"
@@ -243,7 +247,7 @@ function UserForm({user, onClose, onSaved}: {user: User | null; onClose: () => v
             aria-invalid={!!firstError(err, "password")}
           />
         </Field>
-        <Field label="Повтор пароля" error={firstError(err, "password_confirmation")}>
+        <Field label={t("users.passwordConfirmation")} error={firstError(err, "password_confirmation")}>
           <Input
             type="password"
             autoComplete="new-password"
@@ -262,17 +266,17 @@ function UserForm({user, onClose, onSaved}: {user: User | null; onClose: () => v
           className="accent-brand mt-0.5 size-4"
         />
         <span>
-          Может управлять пользователями
-          <span className="text-muted-foreground block text-xs">Доступ к разделу «Пользователи»</span>
+          {t("users.canManage")}
+          <span className="text-muted-foreground block text-xs">{t("users.canManageHint")}</span>
         </span>
       </label>
 
       <DialogFooter>
         <Button type="button" variant="outline" onClick={onClose} disabled={saving}>
-          Отмена
+          {t("users.cancel")}
         </Button>
         <Button type="submit" disabled={saving} className="bg-brand hover:bg-brand/90 text-white">
-          {saving ? "Сохранение…" : "Сохранить"}
+          {saving ? t("users.saving") : t("users.save")}
         </Button>
       </DialogFooter>
     </form>
@@ -282,6 +286,7 @@ function UserForm({user, onClose, onSaved}: {user: User | null; onClose: () => v
 /* ---------- удаление ---------- */
 
 function DeleteDialog({user, onClose, onDeleted}: {user: User | null; onClose: () => void; onDeleted: () => void}) {
+  const {t} = useI18n()
   const [busy, setBusy] = useState(false)
 
   async function remove() {
@@ -289,7 +294,7 @@ function DeleteDialog({user, onClose, onDeleted}: {user: User | null; onClose: (
     setBusy(true)
     try {
       await subUsersApi.remove(user.id)
-      toast.success("Пользователь удалён")
+      toast.success(t("users.deleted"))
       onDeleted()
     } catch (e) {
       // 409 — на пользователя ссылаются заявки или заказы: показываем текст бэка как есть
@@ -304,18 +309,18 @@ function DeleteDialog({user, onClose, onDeleted}: {user: User | null; onClose: (
     <Dialog open={!!user} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Удалить пользователя?</DialogTitle>
+          <DialogTitle>{t("users.deleteTitle")}</DialogTitle>
           <DialogDescription>
-            {user && `${fullName(user) !== "—" ? fullName(user) : user.email} потеряет доступ к кабинету. `}
-            Его подчинённые пользователи перейдут к его руководителю.
+            {user && `${t("users.deleteLosesAccess", {name: fullName(user) !== "—" ? fullName(user) : user.email})} `}
+            {t("users.deleteSubordinates")}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <Button variant="outline" onClick={onClose} disabled={busy}>
-            Отмена
+            {t("users.cancel")}
           </Button>
           <Button variant="destructive" onClick={remove} disabled={busy}>
-            {busy ? "Удаление…" : "Удалить"}
+            {busy ? t("users.deleting") : t("users.delete")}
           </Button>
         </DialogFooter>
       </DialogContent>

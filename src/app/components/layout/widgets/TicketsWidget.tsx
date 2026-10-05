@@ -4,7 +4,8 @@ import Link from "next/link"
 import {ArrowRight, Headset, Plus} from "lucide-react"
 import {ticketsApi} from "@/lib/api/tickets"
 import {useApi} from "@/lib/hooks/useApi"
-import {formatDate, plural} from "@/lib/format"
+import {formatDate} from "@/lib/format"
+import {useI18n} from "@/i18n"
 import {TicketStatusBadge} from "@/app/(main)/tickets/TicketStatusBadge"
 import {WidgetCard} from "./WidgetCard"
 
@@ -13,26 +14,27 @@ const DONE = new Set(["resolved", "closed"])
 
 /** Открытые заявки среди последних 20 (первая страница списка, от новых к старым). */
 export function TicketsWidget() {
+  const {t: tt, tn} = useI18n()
   const {data, error, loading, reload} = useApi(() => ticketsApi.list())
   const open = data?.data.filter((t) => !DONE.has(t.status.name)) ?? []
   const latest = open.slice(0, 3)
 
   return (
     <WidgetCard
-      title="Открытые заявки"
+      title={tt("tickets.widgetTitle")}
       icon={Headset}
       onReload={reload}
       loading={loading && !data}
       refreshing={loading && !!data}
       staleError={!!error && !!data}
-      error={error && !data ? "Не удалось загрузить заявки" : null}
+      error={error && !data ? tt("tickets.widgetLoadError") : null}
     >
       {data && (
         <>
           <p className="text-3xl font-bold tracking-tight tabular-nums">
             {open.length}
             <span className="text-muted-foreground ml-2 text-sm font-medium">
-              {plural(open.length, ["заявка", "заявки", "заявок"])} в работе
+              {tn("tickets.widgetInProgress", open.length)}
             </span>
           </p>
 
@@ -55,15 +57,21 @@ export function TicketsWidget() {
               ))}
             </ul>
           ) : (
-            <p className="text-muted-foreground mt-2 text-sm">Все обращения закрыты.</p>
+            <p className="text-muted-foreground mt-2 text-sm">{tt("tickets.widgetAllClosed")}</p>
           )}
 
           <div className="mt-3 flex items-center justify-between gap-2 text-sm font-medium">
-            <Link href="/tickets" className="text-brand inline-flex items-center gap-1 underline-offset-4 hover:underline">
-              Все заявки <ArrowRight className="size-3.5" />
+            <Link
+              href="/tickets"
+              className="text-brand inline-flex items-center gap-1 underline-offset-4 hover:underline"
+            >
+              {tt("tickets.widgetAll")} <ArrowRight className="size-3.5" />
             </Link>
-            <Link href="/tickets/new" className="text-brand inline-flex items-center gap-1 underline-offset-4 hover:underline">
-              <Plus className="size-3.5" /> Новая
+            <Link
+              href="/tickets/new"
+              className="text-brand inline-flex items-center gap-1 underline-offset-4 hover:underline"
+            >
+              <Plus className="size-3.5" /> {tt("tickets.widgetNew")}
             </Link>
           </div>
         </>

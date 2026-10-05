@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import {usePathname, useRouter} from "next/navigation"
+import {useI18n} from "@/i18n"
 import {cn} from "@/lib/utils"
 import {UserMenu} from "./header/UserMenu"
 import {useAuthStore} from "@/lib/stores/authStore"
@@ -12,6 +13,7 @@ export function Header() {
   const pathname = usePathname()
   const router = useRouter()
 
+  const {t} = useI18n()
   const isManager = useAuthStore((s) => s.user?.is_user_manager)
   const items = navItems.filter((i) => !i.managerOnly || isManager)
 
@@ -19,7 +21,7 @@ export function Header() {
     <header className="bg-card border-border border-b">
       <div className="grid h-16 grid-cols-[1fr_auto_minmax(0,1fr)] items-center gap-3 px-4 md:px-16">
         <Link href="/" className="col-start-1 flex shrink-0 items-center gap-2.5 justify-self-start">
-          <img src="/icon.svg" alt="Логотип" className="size-10" />
+          <img src="/icon.svg" alt={t("shell.logoAlt")} className="size-10" />
           <span className="text-xl font-semibold">Cabinet</span>
         </Link>
 
@@ -39,7 +41,7 @@ export function Header() {
                 )}
               >
                 <Icon className="size-4.5 shrink-0" />
-                {item.label}
+                {t(item.labelKey)}
               </button>
             )
           })}

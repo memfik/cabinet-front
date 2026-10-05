@@ -31,7 +31,16 @@ export function Page({
             {description && <p className="text-muted-foreground mt-1.5 text-base">{description}</p>}
           </div>
           {actions && <div className="flex w-full shrink-0 flex-wrap items-center gap-2 sm:w-auto">{actions}</div>}
-          {illustration && <div className={cn("pointer-events-none -my-6 hidden h-40 w-56 shrink-0 md:block [&>*]:size-full", illustrationClassName)}>{illustration}</div>}
+          {illustration && (
+            <div
+              className={cn(
+                "pointer-events-none -my-6 hidden h-40 w-56 shrink-0 md:block [&>*]:size-full",
+                illustrationClassName
+              )}
+            >
+              {illustration}
+            </div>
+          )}
         </div>
       </div>
       {children}

@@ -2,6 +2,7 @@
 
 import {Coins} from "lucide-react"
 import {useApi} from "@/lib/hooks/useApi"
+import {intlTag, useI18n} from "@/i18n"
 import {WidgetCard} from "./WidgetCard"
 
 const CURRENCIES = [
@@ -24,22 +25,22 @@ async function loadRates(): Promise<Rates> {
   return json
 }
 
-const fmt = new Intl.NumberFormat("ru-RU", {minimumFractionDigits: 2, maximumFractionDigits: 2})
-
 export function CurrencyWidget() {
+  const {t, locale} = useI18n()
+  const fmt = new Intl.NumberFormat(intlTag(locale), {minimumFractionDigits: 2, maximumFractionDigits: 2})
   const {data, error, loading, reload} = useApi(loadRates)
   // Сколько тенге стоит единица валюты: база ответа — USD, поэтому KZT / валюта.
   const toKzt = (code: string) => (data ? data.rates.KZT / data.rates[code] : NaN)
 
   return (
     <WidgetCard
-      title="Курс валют"
+      title={t("widgets.currencyTitle")}
       icon={Coins}
       onReload={reload}
       loading={loading && !data}
       refreshing={loading && !!data}
       staleError={!!error && !!data}
-      error={error && !data ? "Не удалось загрузить курсы" : null}
+      error={error && !data ? t("widgets.currencyError") : null}
     >
       {data && (
         <>
@@ -55,7 +56,9 @@ export function CurrencyWidget() {
             ))}
           </ul>
           <p className="text-muted-foreground mt-3 text-[11px]">
-            Обновлено {new Date(data.time_last_update_utc).toLocaleDateString("ru-RU")} · рыночный курс, не официальный
+            {t("widgets.currencyUpdated", {
+              date: new Date(data.time_last_update_utc).toLocaleDateString(intlTag(locale)),
+            })}
           </p>
         </>
       )}

@@ -1,6 +1,7 @@
 import {toast} from "sonner"
 import {AlertCircle} from "lucide-react"
 import {parseApiError} from "@/lib/api/errors"
+import {tr} from "@/i18n"
 
 export interface FormError {
   /** Ошибки по полям (422 с `errors`). */
@@ -21,7 +22,7 @@ export function handleFormError(err: unknown): FormError {
     const hasFields = Object.keys(e.errors).length > 0
     return {fields: e.errors, banner: hasFields ? null : e.message}
   }
-  const wait = e.status === 429 && e.retryAfter ? ` Повторите через ${e.retryAfter} сек.` : ""
+  const wait = e.status === 429 && e.retryAfter ? ` ${tr("common.retryAfter", {sec: e.retryAfter})}` : ""
   toast.error(e.message + wait)
   return NO_ERROR
 }

@@ -28,31 +28,18 @@ import type {
   UnlimitedSpeed,
   WifiSetup,
 } from "@/lib/api/requests"
+import {useI18n, type MessageKey} from "@/i18n"
 import {useAuthStore} from "@/lib/stores/authStore"
-
-const MONTHS = [
-  "Январь",
-  "Февраль",
-  "Март",
-  "Апрель",
-  "Май",
-  "Июнь",
-  "Июль",
-  "Август",
-  "Сентябрь",
-  "Октябрь",
-  "Ноябрь",
-  "Декабрь",
-]
 
 /** Заявления: три формы, уходящие письмом сотрудникам. Справочники подгружаются с бэка. */
 export default function RequestsPage() {
+  const {t} = useI18n()
   const {data: options, error, loading, reload} = useApi(() => requestsApi.getOptions())
 
   return (
     <Page
-      title="Заявления"
-      description="Запрос документов, изменение настроек и отключение услуг. Заявление уходит сотрудникам письмом."
+      title={t("requests.title")}
+      description={t("requests.description")}
       illustration={<LottieAnimation src="/videos/application.json" />}
     >
       {loading && !options ? (
@@ -70,13 +57,13 @@ export default function RequestsPage() {
           <Tabs defaultValue="document">
             <TabsList className="h-auto w-full flex-wrap gap-1 p-1.5 group-data-horizontal/tabs:h-auto sm:w-fit">
               <TabsTrigger value="document" className="h-11 px-5 text-[15px]">
-                <FileText /> Документ
+                <FileText /> {t("requests.tabDocument")}
               </TabsTrigger>
               <TabsTrigger value="settings" className="h-11 px-5 text-[15px]">
-                <Settings2 /> Настройки услуг
+                <Settings2 /> {t("requests.tabSettings")}
               </TabsTrigger>
               <TabsTrigger value="disconnect" className="h-11 px-5 text-[15px]">
-                <PowerOff /> Отключение
+                <PowerOff /> {t("requests.tabDisconnect")}
               </TabsTrigger>
             </TabsList>
             <TabsContent value="document" className="mt-4">
@@ -98,6 +85,7 @@ export default function RequestsPage() {
 /* ---------- (а) запрос документа ---------- */
 
 function DocumentForm({options}: {options: RequestFormOptions}) {
+  const {t} = useI18n()
   const userEmail = useAuthStore((s) => s.user?.email)
   const now = new Date()
   const [type, setType] = useState("")
@@ -118,7 +106,7 @@ function DocumentForm({options}: {options: RequestFormOptions}) {
         year: Number(year),
         email,
       })
-      toast.success("Заявление отправлено")
+      toast.success(t("requests.sent"))
     } catch (e) {
       setErr(handleFormError(e))
     } finally {
@@ -130,24 +118,32 @@ function DocumentForm({options}: {options: RequestFormOptions}) {
     <Card className="p-5 md:p-6">
       <ErrorBanner message={err.banner} />
       <form onSubmit={submit} className="grid gap-5 sm:grid-cols-2">
-        <Field label="Документ" required error={firstError(err, "type")} className="sm:col-span-2">
+        <Field label={t("requests.documentLabel")} required error={firstError(err, "type")} className="sm:col-span-2">
           <SelectField
             value={type}
             onChange={setType}
             options={options.document_types}
-            placeholder="Выберите документ"
+            placeholder={t("requests.documentPlaceholder")}
             invalid={!!firstError(err, "type")}
           />
         </Field>
-        <Field label="Месяц" required error={firstError(err, "month")}>
+        <Field label={t("requests.monthLabel")} required error={firstError(err, "month")}>
           <SelectField
             value={month}
             onChange={setMonth}
-            options={MONTHS.map((label, i) => ({value: String(i + 1), label}))}
+            options={Array.from({length: 12}, (_, i) => ({
+              value: String(i + 1),
+              label: t(`requests.month${i + 1}` as MessageKey),
+            }))}
             invalid={!!firstError(err, "month")}
           />
         </Field>
-        <Field label="Год" required error={firstError(err, "year")} hint={`От 2012 до ${now.getFullYear()}`}>
+        <Field
+          label={t("requests.yearLabel")}
+          required
+          error={firstError(err, "year")}
+          hint={t("requests.yearHint", {year: now.getFullYear()})}
+        >
           <Input
             type="number"
             min={2012}
@@ -157,7 +153,7 @@ function DocumentForm({options}: {options: RequestFormOptions}) {
             aria-invalid={!!firstError(err, "year")}
           />
         </Field>
-        <Field label="Email для отправки" required error={firstError(err, "email")} className="sm:col-span-2">
+        <Field label={t("requests.emailLabel")} required error={firstError(err, "email")} className="sm:col-span-2">
           <Input
             type="email"
             value={email}
@@ -168,7 +164,7 @@ function DocumentForm({options}: {options: RequestFormOptions}) {
         </Field>
         <div className="sm:col-span-2">
           <Button type="submit" disabled={sending || !type} className="bg-brand hover:bg-brand/90 h-10 px-5 text-white">
-            {sending ? "Отправка…" : "Отправить заявление"}
+            {sending ? t("requests.sending") : t("requests.submit")}
           </Button>
         </div>
       </form>
@@ -181,6 +177,7 @@ function DocumentForm({options}: {options: RequestFormOptions}) {
 type Change = "" | "open" | "close"
 
 function SettingsForm({options}: {options: RequestFormOptions}) {
+  const {t} = useI18n()
   const [addresses, setAddresses] = useState("")
   const [contact, setContact] = useState("")
   const [telephony, setTelephony] = useState("")
@@ -194,7 +191,7 @@ function SettingsForm({options}: {options: RequestFormOptions}) {
   const [err, setErr] = useState<FormError>(NO_ERROR)
 
   // «Не менять» — пустое значение, в payload не попадает
-  const withKeep = (list: Option[]): Option[] => [{value: "", label: "Не менять"}, ...list]
+  const withKeep = (list: Option[]): Option[] => [{value: "", label: t("requests.keep")}, ...list]
 
   async function submit(e: React.FormEvent) {
     e.preventDefault()
@@ -215,7 +212,7 @@ function SettingsForm({options}: {options: RequestFormOptions}) {
 
     try {
       await requestsApi.sendServiceSettings(payload)
-      toast.success("Заявление отправлено")
+      toast.success(t("requests.sent"))
     } catch (e) {
       setErr(handleFormError(e))
     } finally {
@@ -228,7 +225,12 @@ function SettingsForm({options}: {options: RequestFormOptions}) {
       <ErrorBanner message={err.banner} />
       <form onSubmit={submit} className="space-y-6">
         <div className="grid gap-5 sm:grid-cols-2">
-          <Field label="Адреса подключения" required error={firstError(err, "addresses")} className="sm:col-span-2">
+          <Field
+            label={t("requests.addressesLabel")}
+            required
+            error={firstError(err, "addresses")}
+            className="sm:col-span-2"
+          >
             <Textarea
               value={addresses}
               onChange={(e) => setAddresses(e.target.value)}
@@ -238,7 +240,7 @@ function SettingsForm({options}: {options: RequestFormOptions}) {
             />
           </Field>
           <Field
-            label="Контактное лицо и телефон"
+            label={t("requests.contactLabel")}
             required
             error={firstError(err, "contact")}
             className="sm:col-span-2"
@@ -247,51 +249,51 @@ function SettingsForm({options}: {options: RequestFormOptions}) {
               value={contact}
               onChange={(e) => setContact(e.target.value)}
               maxLength={500}
-              placeholder="Иван Иванов, +7 701 000 00 00"
+              placeholder={t("requests.contactPlaceholder")}
               aria-invalid={!!firstError(err, "contact")}
             />
           </Field>
         </div>
 
-        <p className="text-muted-foreground text-sm">Заполните только то, что нужно изменить.</p>
+        <p className="text-muted-foreground text-sm">{t("requests.fillOnlyChanges")}</p>
 
         <div className="grid gap-5 sm:grid-cols-2">
-          <Field label="Телефония" error={firstError(err, "telephony")}>
+          <Field label={t("requests.telephony")} error={firstError(err, "telephony")}>
             <SelectField
               value={telephony}
               onChange={setTelephony}
               options={withKeep(options.service_availability_changes)}
             />
           </Field>
-          <Field label="Интернет" error={firstError(err, "internet")}>
+          <Field label={t("requests.internet")} error={firstError(err, "internet")}>
             <SelectField
               value={internet}
               onChange={setInternet}
               options={withKeep(options.service_availability_changes)}
             />
           </Field>
-          <Field label="Настройка Wi-Fi" error={firstError(err, "wifi_setup")}>
+          <Field label={t("requests.wifiSetup")} error={firstError(err, "wifi_setup")}>
             <SelectField value={wifi} onChange={setWifi} options={withKeep(options.wifi_setups)} />
           </Field>
           <span className="hidden sm:block" />
-          <Field label="Скорость безлимитного тарифа" error={firstError(err, "unlimited_speed")}>
+          <Field label={t("requests.unlimitedSpeed")} error={firstError(err, "unlimited_speed")}>
             <SelectField value={unlimited} onChange={setUnlimited} options={withKeep(options.unlimited_speeds)} />
           </Field>
-          <Field label="Скорость и объём предоплаченного тарифа" error={firstError(err, "prepaid_speed")}>
+          <Field label={t("requests.prepaidSpeed")} error={firstError(err, "prepaid_speed")}>
             <SelectField value={prepaid} onChange={setPrepaid} options={withKeep(options.prepaid_speeds)} />
           </Field>
         </div>
 
         <div>
           <h3 className="mb-2 flex items-center gap-2 text-sm font-medium">
-            <Phone className="text-muted-foreground size-4" /> Опции телефонии
+            <Phone className="text-muted-foreground size-4" /> {t("requests.phoneOptions")}
           </h3>
           <div className="border-border divide-border divide-y rounded-lg border">
             {options.phone_options.map((o) => (
               <div key={o.value} className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3">
                 <div className="flex min-w-0 items-center gap-2 text-sm">
                   <span>{o.label}</span>
-                  {o.is_paid_call && <Badge tone="warning">платные звонки</Badge>}
+                  {o.is_paid_call && <Badge tone="warning">{t("requests.paidCalls")}</Badge>}
                 </div>
                 <Segmented
                   value={phoneOptions[o.value] ?? ""}
@@ -306,12 +308,12 @@ function SettingsForm({options}: {options: RequestFormOptions}) {
           )}
         </div>
 
-        <Field label="Комментарий" error={firstError(err, "comment")}>
+        <Field label={t("requests.comment")} error={firstError(err, "comment")}>
           <Textarea value={comment} onChange={(e) => setComment(e.target.value)} rows={3} maxLength={2000} />
         </Field>
 
         <Button type="submit" disabled={sending} className="bg-brand hover:bg-brand/90 h-10 px-5 text-white">
-          {sending ? "Отправка…" : "Отправить заявление"}
+          {sending ? t("requests.sending") : t("requests.submit")}
         </Button>
       </form>
     </Card>
@@ -344,6 +346,7 @@ function Segmented({value, onChange, options}: {value: string; onChange: (v: str
 /* ---------- (в) отключение услуги ---------- */
 
 function DisconnectionForm() {
+  const {t} = useI18n()
   const {data: dashboard, error, loading, reload} = useApi(() => dashboardApi.get())
   const [service, setService] = useState("")
   const [confirm, setConfirm] = useState(false)
@@ -359,7 +362,7 @@ function DisconnectionForm() {
     setErr(NO_ERROR)
     try {
       await requestsApi.sendDisconnection({tariff_id: selected.tariff_id, account_name_id: selected.account_name_id})
-      toast.success("Заявление на отключение отправлено")
+      toast.success(t("requests.disconnectSent"))
       setService("")
     } catch (e) {
       setErr(handleFormError(e))
@@ -387,10 +390,10 @@ function DisconnectionForm() {
       <ErrorBanner message={err.banner} />
       <div className="space-y-5">
         <Field
-          label="Услуга для отключения"
+          label={t("requests.serviceLabel")}
           required
           error={firstError(err, "tariff_id") ?? firstError(err, "account_name_id")}
-          hint={services.length ? undefined : "У вас нет активных услуг"}
+          hint={services.length ? undefined : t("requests.noActiveServices")}
         >
           <SelectField
             value={service}
@@ -399,29 +402,27 @@ function DisconnectionForm() {
               value: `${s.tariff_id}:${s.account_name_id}`,
               label: `${s.name} — ${s.tariff_name}`,
             }))}
-            placeholder="Выберите услугу"
+            placeholder={t("requests.servicePlaceholder")}
             disabled={!services.length}
           />
         </Field>
         <Button variant="destructive" className="h-10 px-5" disabled={!selected} onClick={() => setConfirm(true)}>
-          <PowerOff /> Подать заявление на отключение
+          <PowerOff /> {t("requests.disconnectButton")}
         </Button>
       </div>
 
       <Dialog open={confirm} onOpenChange={setConfirm}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Отключить услугу?</DialogTitle>
-            <DialogDescription>
-              Сотрудникам уйдёт заявление на отключение услуги «{selected?.name}». Отменить его из кабинета нельзя.
-            </DialogDescription>
+            <DialogTitle>{t("requests.confirmTitle")}</DialogTitle>
+            <DialogDescription>{t("requests.confirmDescription", {name: selected?.name})}</DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setConfirm(false)} disabled={sending}>
-              Отмена
+              {t("requests.cancel")}
             </Button>
             <Button variant="destructive" onClick={send} disabled={sending}>
-              {sending ? "Отправка…" : "Отключить"}
+              {sending ? t("requests.sending") : t("requests.disconnect")}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -6,6 +6,7 @@
  * Базовый путь — NEXT_PUBLIC_API_URL со слэшем на конце, поэтому пути даём БЕЗ ведущего слэша.
  */
 import axios from "axios"
+import {getLocale} from "@/i18n"
 
 declare module "axios" {
   export interface AxiosRequestConfig {
@@ -48,6 +49,8 @@ apiClient.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
+  // бэк отвечает по-русски, но язык интерфейса передаём — пригодится, когда он научится локализовать ответы
+  config.headers["Accept-Language"] = getLocale()
   return config
 })
 

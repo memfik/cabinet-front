@@ -1,0 +1,47 @@
+import {defineNamespace} from "./types"
+
+export default defineNamespace({
+  catTelephony: {ru: "Телефония", en: "Telephony", kk: "Телефония"},
+  catInternet: {ru: "Интернет", en: "Internet", kk: "Интернет"},
+  catOther: {ru: "Прочее", en: "Other", kk: "Басқа"},
+  linkPayments: {ru: "История платежей", en: "Payment history", kk: "Төлемдер тарихы"},
+  linkInvoices: {ru: "Счета и документы", en: "Invoices and documents", kk: "Шоттар мен құжаттар"},
+  linkNewTicket: {ru: "Создать заявку", en: "Create a ticket", kk: "Өтінім жасау"},
+  linkRequests: {ru: "Подать заявление", en: "Submit a request", kk: "Өтініш беру"},
+  greeting: {ru: "Здравствуйте, {name}!", en: "Hello, {name}!", kk: "Сәлеметсіз бе, {name}!"},
+  titleDefault: {ru: "Личный кабинет", en: "Account", kk: "Жеке кабинет"},
+  description: {
+    ru: "Сводка по вашему договору",
+    en: "Summary of your contract",
+    kk: "Шартыңыз бойынша қысқаша мәлімет",
+  },
+  noContractTitle: {ru: "Договор не найден", en: "Contract not found", kk: "Шарт табылмады"},
+  noContractDescription: {
+    ru: "К вашей учётной записи не привязан лицевой счёт. Обратитесь к персональному менеджеру.",
+    en: "No account is linked to your profile. Please contact your personal manager.",
+    kk: "Тіркелгіңізге жеке шот байланыстырылмаған. Жеке менеджеріңізге хабарласыңыз.",
+  },
+  contract: {ru: "Договор", en: "Contract", kk: "Шарт"},
+  company: {ru: "Компания", en: "Company", kk: "Компания"},
+  client: {ru: "Клиент", en: "Client", kk: "Клиент"},
+  contractNumber: {ru: "Номер договора", en: "Contract number", kk: "Шарт нөмірі"},
+  account: {ru: "Лицевой счёт", en: "Account", kk: "Жеке шот"},
+  manager: {ru: "Персональный менеджер", en: "Personal manager", kk: "Жеке менеджер"},
+  activeServices: {ru: "Активные услуги", en: "Active services", kk: "Белсенді қызметтер"},
+  servicesCount: {
+    ru: ["{n} услуга", "{n} услуги", "{n} услуг"],
+    en: ["{n} service", "{n} services", "{n} services"],
+    kk: "{n} қызмет",
+  },
+  noServices: {ru: "Нет активных услуг", en: "No active services", kk: "Белсенді қызметтер жоқ"},
+  debt: {ru: "Задолженность", en: "Debt", kk: "Берешек"},
+  balance: {ru: "Баланс", en: "Balance", kk: "Баланс"},
+  topUpHint: {
+    ru: "Пополните счёт, чтобы избежать отключения",
+    en: "Top up your account to avoid disconnection",
+    kk: "Өшіріліп қалмас үшін шотты толықтырыңыз",
+  },
+  accountNumber: {ru: "Лицевой счёт {account}", en: "Account {account}", kk: "Жеке шот {account}"},
+  tariff: {ru: "Тариф: {name}", en: "Plan: {name}", kk: "Тариф: {name}"},
+  callStats: {ru: "Статистика звонков", en: "Call statistics", kk: "Қоңыраулар статистикасы"},
+})

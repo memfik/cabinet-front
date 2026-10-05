@@ -4,6 +4,7 @@ import {AlertCircle, Inbox, RefreshCw} from "lucide-react"
 import {Button} from "@/components/ui/button"
 import {cn} from "@/lib/utils"
 import type {ApiError} from "@/lib/api/errors"
+import {useI18n} from "@/i18n"
 
 export function Skeleton({className}: {className?: string}) {
   return <div className={cn("bg-muted animate-pulse rounded-md", className)} />
@@ -53,18 +54,17 @@ export function EmptyState({
  * поэтому просто показываем его и даём кнопку «Повторить».
  */
 export function ErrorState({error, onRetry}: {error: ApiError; onRetry?: () => void}) {
+  const {t} = useI18n()
   return (
     <div className="flex flex-col items-center px-6 py-14 text-center">
       <span className="bg-destructive/10 text-destructive mb-3 flex size-12 items-center justify-center rounded-full">
         <AlertCircle className="size-6" />
       </span>
-      <p className="font-medium">
-        {error.status === 503 ? "Сервис временно недоступен" : "Не удалось загрузить данные"}
-      </p>
+      <p className="font-medium">{error.status === 503 ? t("common.serviceUnavailable") : t("common.loadFailed")}</p>
       <p className="text-muted-foreground mt-1 max-w-sm text-sm">{error.message}</p>
       {onRetry && (
         <Button variant="outline" className="mt-4" onClick={onRetry}>
-          <RefreshCw /> Повторить
+          <RefreshCw /> {t("common.retry")}
         </Button>
       )}
     </div>

@@ -1,7 +1,7 @@
 "use client"
 
 import {useRouter} from "next/navigation"
-import {ChevronDown, ChevronsUpDown, LogOut, Sun, Moon, User as UserIcon} from "lucide-react"
+import {ChevronDown, ChevronsUpDown, Languages, LogOut, Sun, Moon, User as UserIcon} from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,6 +9,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {useI18n} from "@/i18n"
+import {LanguageSwitcher} from "@/i18n/ui/LanguageSwitcher"
 import {useAppTheme} from "../ThemeContext"
 import {cn} from "@/lib/utils"
 import {authApi} from "@/lib/api/auth"
@@ -33,16 +35,17 @@ function getInitials(name: string) {
 export function UserMenu({variant = "header"}: {variant?: "header" | "rail"}) {
   const rail = variant === "rail"
   const router = useRouter()
+  const {t} = useI18n()
   const {isDark, setDark} = useAppTheme()
   const clearAuth = useAuthStore((s) => s.clearAuth)
   const user = useAuthStore((s) => s.user)
-  const name = [user?.first_name, user?.last_name].filter(Boolean).join(" ") || "Пользователь"
+  const name = [user?.first_name, user?.last_name].filter(Boolean).join(" ") || t("shell.defaultUser")
 
   async function handleLogout() {
     await authApi.logout()
     clearToken()
     clearAuth()
-    toast.success("Вы вышли из системы.")
+    toast.success(t("shell.loggedOut"))
     router.push("/login")
   }
 
@@ -108,7 +111,7 @@ export function UserMenu({variant = "header"}: {variant?: "header" | "rail"}) {
 
         <div className="px-4 pt-3 pb-4">
           <p className="text-muted-foreground mb-2 text-[11px] font-semibold tracking-wider uppercase">
-            Тема оформления
+            {t("shell.theme")}
           </p>
           <div className="flex gap-2">
             <button
@@ -119,7 +122,7 @@ export function UserMenu({variant = "header"}: {variant?: "header" | "rail"}) {
               )}
             >
               <Sun className="size-4" />
-              Светлая
+              {t("shell.themeLight")}
             </button>
             <button
               onClick={(e) => setDark(true, e)}
@@ -129,9 +132,18 @@ export function UserMenu({variant = "header"}: {variant?: "header" | "rail"}) {
               )}
             >
               <Moon className="size-4" />
-              Тёмная
+              {t("shell.themeDark")}
             </button>
           </div>
+        </div>
+        <DropdownMenuSeparator className="my-0" />
+
+        <div className="px-4 pt-3 pb-4">
+          <p className="text-muted-foreground mb-2 flex items-center gap-1.5 text-[11px] font-semibold tracking-wider uppercase">
+            <Languages className="size-3.5" />
+            {t("shell.language")}
+          </p>
+          <LanguageSwitcher />
         </div>
         <DropdownMenuSeparator className="my-0" />
 
@@ -141,14 +153,14 @@ export function UserMenu({variant = "header"}: {variant?: "header" | "rail"}) {
             className="flex cursor-pointer items-center gap-2.5 rounded-none px-4 py-2.5 text-sm"
           >
             <UserIcon className="text-muted-foreground size-4.5" />
-            <span>Профиль</span>
+            <span>{t("shell.profile")}</span>
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={handleLogout}
             className="flex cursor-pointer items-center gap-2.5 rounded-none px-4 py-2.5 text-sm"
           >
             <LogOut className="text-muted-foreground size-4.5" />
-            <span>Выйти</span>
+            <span>{t("shell.signOut")}</span>
           </DropdownMenuItem>
         </div>
       </DropdownMenuContent>

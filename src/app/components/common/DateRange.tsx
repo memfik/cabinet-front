@@ -4,6 +4,7 @@ import {Input} from "@/components/ui/input"
 import {daysAgoInput, toDateInput} from "@/lib/format"
 import {cn} from "@/lib/utils"
 import {Field} from "./Field"
+import {useI18n} from "@/i18n"
 
 /**
  * Пара полей «с … по …» (`YYYY-MM-DD`). На мобильном — два поля в ряд на всю ширину.
@@ -22,6 +23,7 @@ export function DateRange({
   error?: string
   presets?: number[]
 }) {
+  const {t} = useI18n()
   const today = toDateInput(new Date())
 
   return (
@@ -45,7 +47,7 @@ export function DateRange({
                     : "text-muted-foreground hover:bg-background/60 hover:text-foreground"
                 )}
               >
-                {days} дн.
+                {t("common.daysShort", {n: days})}
               </button>
             )
           })}
@@ -53,7 +55,7 @@ export function DateRange({
       )}
 
       <div className="grid grid-cols-2 gap-3 sm:flex sm:items-end sm:gap-2">
-        <Field label="С">
+        <Field label={t("common.dateFrom")}>
           <Input
             type="date"
             value={from}
@@ -63,7 +65,7 @@ export function DateRange({
           />
         </Field>
         <span className="text-muted-foreground hidden h-11 items-center sm:flex">—</span>
-        <Field label="По">
+        <Field label={t("common.dateTo")}>
           <Input
             type="date"
             value={to}

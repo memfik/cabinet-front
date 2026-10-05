@@ -10,31 +10,33 @@ import {buttonVariants} from "@/components/ui/button"
 import {dashboardApi, type DashboardService, type ServiceCategory} from "@/lib/api/dashboard"
 import {useApi} from "@/lib/hooks/useApi"
 import {useAuthStore} from "@/lib/stores/authStore"
-import {formatMoney, isNegative, plural} from "@/lib/format"
+import {formatMoney, isNegative} from "@/lib/format"
+import {useI18n, type MessageKey} from "@/i18n"
 import {cn} from "@/lib/utils"
 
-const categories: Record<ServiceCategory, {label: string; icon: typeof Phone}> = {
-  telephony: {label: "Телефония", icon: Phone},
-  internet: {label: "Интернет", icon: Globe},
-  other: {label: "Прочее", icon: Building2},
+const categories: Record<ServiceCategory, {label: MessageKey; icon: typeof Phone}> = {
+  telephony: {label: "home.catTelephony", icon: Phone},
+  internet: {label: "home.catInternet", icon: Globe},
+  other: {label: "home.catOther", icon: Building2},
 }
 
-const quickLinks = [
-  {href: "/payments", label: "История платежей", icon: Wallet},
-  {href: "/invoices", label: "Счета и документы", icon: FileText},
-  {href: "/tickets/new", label: "Создать заявку", icon: Headset},
-  {href: "/requests", label: "Подать заявление", icon: Send},
+const quickLinks: {href: string; label: MessageKey; icon: typeof Phone}[] = [
+  {href: "/payments", label: "home.linkPayments", icon: Wallet},
+  {href: "/invoices", label: "home.linkInvoices", icon: FileText},
+  {href: "/tickets/new", label: "home.linkNewTicket", icon: Headset},
+  {href: "/requests", label: "home.linkRequests", icon: Send},
 ]
 
 /** Главная: баланс, данные договора и активные услуги (GET /dashboard). */
 export default function Home() {
+  const {t, tn} = useI18n()
   const user = useAuthStore((s) => s.user)
   const {data, error, loading, reload} = useApi(() => dashboardApi.get())
 
   return (
     <Page
-      title={user?.first_name ? `Здравствуйте, ${user.first_name}!` : "Личный кабинет"}
-      description="Сводка по вашему договору"
+      title={user?.first_name ? t("home.greeting", {name: user.first_name}) : t("home.titleDefault")}
+      description={t("home.description")}
       illustration={<LottieAnimation src="/videos/welcome.json" />}
       illustrationClassName="-my-8 h-52 w-72"
     >
@@ -48,8 +50,8 @@ export default function Home() {
         <Card>
           <EmptyState
             icon={Building2}
-            title="Договор не найден"
-            description="К вашей учётной записи не привязан лицевой счёт. Обратитесь к персональному менеджеру."
+            title={t("home.noContractTitle")}
+            description={t("home.noContractDescription")}
           />
         </Card>
       ) : data ? (
@@ -57,26 +59,28 @@ export default function Home() {
           <BalanceCard balance={data.balance} account={data.account_number} />
 
           <Card className="lg:col-span-2">
-            <CardHeader title="Договор" />
+            <CardHeader title={t("home.contract")} />
             <dl className="grid gap-x-6 gap-y-4 p-5 text-sm sm:grid-cols-2">
-              <Info icon={UserRound} label={data.is_company ? "Компания" : "Клиент"} value={data.client_name} />
-              <Info icon={FileText} label="Номер договора" value={data.contract_code} />
-              <Info icon={Wallet} label="Лицевой счёт" value={data.account_number} />
-              <Info icon={UserRound} label="Персональный менеджер" value={data.account_manager} />
+              <Info
+                icon={UserRound}
+                label={data.is_company ? t("home.company") : t("home.client")}
+                value={data.client_name}
+              />
+              <Info icon={FileText} label={t("home.contractNumber")} value={data.contract_code} />
+              <Info icon={Wallet} label={t("home.account")} value={data.account_number} />
+              <Info icon={UserRound} label={t("home.manager")} value={data.account_manager} />
             </dl>
           </Card>
 
           <Card className="lg:col-span-3">
             <CardHeader
-              title="Активные услуги"
+              title={t("home.activeServices")}
               actions={
-                <span className="text-muted-foreground text-sm">
-                  {data.services.length} {plural(data.services.length, ["услуга", "услуги", "услуг"])}
-                </span>
+                <span className="text-muted-foreground text-sm">{tn("home.servicesCount", data.services.length)}</span>
               }
             />
             {data.services.length === 0 ? (
-              <EmptyState title="Нет активных услуг" />
+              <EmptyState title={t("home.noServices")} />
             ) : (
               <ul className="divide-border divide-y">
                 {data.services.map((s) => (
@@ -96,7 +100,7 @@ export default function Home() {
                 <span className="bg-brand/10 text-brand flex size-10 shrink-0 items-center justify-center rounded-lg">
                   <Icon className="size-5" />
                 </span>
-                <span className="flex-1 text-sm font-medium">{label}</span>
+                <span className="flex-1 text-sm font-medium">{t(label)}</span>
                 <ArrowRight className="text-muted-foreground group-hover:text-brand size-4 transition-colors" />
               </Link>
             ))}
@@ -109,25 +113,22 @@ export default function Home() {
 
 /** Баланс: отрицательный — задолженность, красным. */
 function BalanceCard({balance, account}: {balance: string | null; account: string | null}) {
+  const {t} = useI18n()
   const debt = isNegative(balance)
   return (
     <Card className="bg-brand border-transparent p-5 text-white">
       <div className="flex items-center justify-between text-sm text-white/80">
-        <span>{debt ? "Задолженность" : "Баланс"}</span>
+        <span>{debt ? t("home.debt") : t("home.balance")}</span>
         <Wallet className="size-5" />
       </div>
       <p className="mt-3 text-3xl font-bold tracking-tight tabular-nums">{formatMoney(balance)}</p>
-      {debt && (
-        <p className="mt-2 inline-block rounded-md bg-white/15 px-2 py-0.5 text-xs">
-          Пополните счёт, чтобы избежать отключения
-        </p>
-      )}
-      <p className="mt-4 text-xs text-white/70">Лицевой счёт {account ?? "—"}</p>
+      {debt && <p className="mt-2 inline-block rounded-md bg-white/15 px-2 py-0.5 text-xs">{t("home.topUpHint")}</p>}
+      <p className="mt-4 text-xs text-white/70">{t("home.accountNumber", {account: account ?? "—"})}</p>
       <Link
         href="/payments"
         className="mt-1 inline-flex items-center gap-1 text-sm font-medium underline-offset-4 hover:underline"
       >
-        История платежей <ArrowRight className="size-3.5" />
+        {t("home.linkPayments")} <ArrowRight className="size-3.5" />
       </Link>
     </Card>
   )
@@ -148,6 +149,7 @@ function Info({icon: Icon, label, value}: {icon: typeof Phone; label: string; va
 }
 
 function ServiceRow({service}: {service: DashboardService}) {
+  const {t} = useI18n()
   const {label, icon: Icon} = categories[service.category]
   return (
     <li className="flex flex-wrap items-center gap-x-4 gap-y-2 px-5 py-4">
@@ -156,15 +158,15 @@ function ServiceRow({service}: {service: DashboardService}) {
       </span>
       <div className="min-w-0 flex-1 basis-56">
         <p className="font-medium">{service.name}</p>
-        <p className="text-muted-foreground text-sm">Тариф: {service.tariff_name}</p>
+        <p className="text-muted-foreground text-sm">{t("home.tariff", {name: service.tariff_name})}</p>
       </div>
-      <Badge tone={service.category === "other" ? "neutral" : "brand"}>{label}</Badge>
+      <Badge tone={service.category === "other" ? "neutral" : "brand"}>{t(label)}</Badge>
       {service.has_statistics && (
         <Link
           href={`/services/${service.tariff_id}/${service.account_name_id}`}
           className={cn(buttonVariants({variant: "outline"}), "h-9")}
         >
-          <BarChart3 /> Статистика звонков
+          <BarChart3 /> {t("home.callStats")}
         </Link>
       )}
     </li>

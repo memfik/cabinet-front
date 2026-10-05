@@ -10,10 +10,12 @@ import {EmptyState, ErrorState, ListSkeleton} from "@/app/components/common/Stat
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table"
 import {servicesApi} from "@/lib/api/services"
 import {useApi} from "@/lib/hooks/useApi"
+import {useI18n} from "@/i18n"
 import {daysAgoInput, formatDateTime, formatDuration, formatMoney, toDateInput} from "@/lib/format"
 
 /** Статистика звонков по услуге телефонии (GET /services/{tariffId}/{accountNameId}/calls): период до 30 дней. */
 export default function CallsPage() {
+  const {t} = useI18n()
   const {tariffId, accountNameId} = useParams<{tariffId: string; accountNameId: string}>()
   const [range, setRange] = useState({from: daysAgoInput(29), to: toDateInput(new Date())})
   const {data, error, loading, reload} = useApi(
@@ -26,11 +28,11 @@ export default function CallsPage() {
 
   return (
     <Page
-      title="Статистика звонков"
-      description="Только платные звонки, стоимость с НДС 12%. Период — не более 30 дней."
+      title={t("services.title")}
+      description={t("services.description")}
       actions={
         <Link href="/" className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 text-sm">
-          <ArrowLeft className="size-4" /> На главную
+          <ArrowLeft className="size-4" /> {t("services.backHome")}
         </Link>
       }
     >
@@ -40,36 +42,32 @@ export default function CallsPage() {
 
       {data && (
         <div className="mb-4 grid gap-3 sm:grid-cols-3">
-          <Stat icon={PhoneCall} label="Платных звонков" value={String(data.calls.length)} />
-          <Stat icon={Clock} label="Общая длительность" value={formatDuration(data.total_duration_seconds)} />
-          <Stat icon={Wallet} label="Общая стоимость" value={formatMoney(data.total_cost)} />
+          <Stat icon={PhoneCall} label={t("services.paidCalls")} value={String(data.calls.length)} />
+          <Stat icon={Clock} label={t("services.totalDuration")} value={formatDuration(data.total_duration_seconds)} />
+          <Stat icon={Wallet} label={t("services.totalCost")} value={formatMoney(data.total_cost)} />
         </div>
       )}
 
       <Card>
-        <CardHeader title="Звонки" />
+        <CardHeader title={t("services.calls")} />
         {error && !rangeError ? (
           // 404 — услуга не из договора; остальное — общая ошибка
           <ErrorState error={error} onRetry={error.status === 404 ? undefined : reload} />
         ) : loading && !data ? (
           <ListSkeleton />
         ) : !data?.calls.length ? (
-          <EmptyState
-            icon={PhoneCall}
-            title="Платных звонков нет"
-            description="За выбранный период платных звонков не было."
-          />
+          <EmptyState icon={PhoneCall} title={t("services.emptyTitle")} description={t("services.emptyDescription")} />
         ) : (
           <div className={loading ? "opacity-60 transition-opacity" : "transition-opacity"}>
             <div className="hidden md:block">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="pl-5">Дата и время</TableHead>
-                    <TableHead>Откуда</TableHead>
-                    <TableHead>Куда</TableHead>
-                    <TableHead>Длительность</TableHead>
-                    <TableHead className="pr-5 text-right">Стоимость</TableHead>
+                    <TableHead className="pl-5">{t("services.colDateTime")}</TableHead>
+                    <TableHead>{t("services.colFrom")}</TableHead>
+                    <TableHead>{t("services.colTo")}</TableHead>
+                    <TableHead>{t("services.colDuration")}</TableHead>
+                    <TableHead className="pr-5 text-right">{t("services.colCost")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

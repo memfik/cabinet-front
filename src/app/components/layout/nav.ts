@@ -1,7 +1,8 @@
+import type {MessageKey} from "@/i18n"
 import {CreditCard, FileText, Headset, Home, Satellite, Send, Users} from "lucide-react"
 
 export interface NavItem {
-  label: string
+  labelKey: MessageKey
   href: string
   icon: React.ComponentType<{className?: string}>
   /** Только для пользователей с `is_user_manager` (раздел «Пользователи»). */
@@ -10,13 +11,13 @@ export interface NavItem {
 
 /** Разделы кабинета — единый список для шапки и нижней навигации. Профиль — в меню пользователя. */
 export const navItems: NavItem[] = [
-  {label: "Главная", href: "/", icon: Home},
-  {label: "Платежи", href: "/payments", icon: CreditCard},
-  {label: "Документы", href: "/invoices", icon: FileText},
-  {label: "Заявки", href: "/tickets", icon: Headset},
-  {label: "Заявления", href: "/requests", icon: Send},
-  {label: "OneWeb", href: "/oneweb", icon: Satellite},
-  {label: "Пользователи", href: "/users", icon: Users, managerOnly: true},
+  {labelKey: "shell.navHome", href: "/", icon: Home},
+  {labelKey: "shell.navPayments", href: "/payments", icon: CreditCard},
+  {labelKey: "shell.navDocuments", href: "/invoices", icon: FileText},
+  {labelKey: "shell.navTickets", href: "/tickets", icon: Headset},
+  {labelKey: "shell.navRequests", href: "/requests", icon: Send},
+  {labelKey: "shell.navOneWeb", href: "/oneweb", icon: Satellite},
+  {labelKey: "shell.navUsers", href: "/users", icon: Users, managerOnly: true},
 ]
 
 export const isNavActive = (pathname: string, href: string) =>

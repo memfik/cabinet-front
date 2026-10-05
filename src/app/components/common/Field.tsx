@@ -3,6 +3,7 @@
 import {Label} from "@/components/ui/label"
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
 import {cn} from "@/lib/utils"
+import {useI18n} from "@/i18n"
 
 /** Поле формы: подпись, контрол и ошибка валидации (422) под ним. */
 export function Field({
@@ -48,7 +49,7 @@ export function SelectField({
   value,
   onChange,
   options,
-  placeholder = "Выберите…",
+  placeholder,
   invalid,
   className,
   disabled,
@@ -61,12 +62,13 @@ export function SelectField({
   className?: string
   disabled?: boolean
 }) {
+  const {t} = useI18n()
   const current = options.find((o) => o.value === value)
   return (
     <Select value={value} onValueChange={(v) => onChange(v ?? "")} items={options} disabled={disabled}>
       <SelectTrigger className={cn("w-full", className)} aria-invalid={invalid}>
         <SelectValue>
-          {current ? current.label : <span className="text-muted-foreground">{placeholder}</span>}
+          {current ? current.label : <span className="text-muted-foreground">{placeholder ?? t("common.select")}</span>}
         </SelectValue>
       </SelectTrigger>
       <SelectContent>

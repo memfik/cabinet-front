@@ -13,6 +13,14 @@ import {invoicesApi, saveFile, type Invoice, type InvoiceDocumentType} from "@/l
 import {errMsg} from "@/lib/api/errors"
 import {useApi} from "@/lib/hooks/useApi"
 import {formatDate, formatMoney} from "@/lib/format"
+import {useI18n, type MessageKey} from "@/i18n"
+
+const typeLabel: Record<InvoiceDocumentType, MessageKey> = {
+  "account-notice": "invoices.typeAccountNotice",
+  invoice: "invoices.typeInvoice",
+  "one-time-invoice": "invoices.typeOneTimeInvoice",
+  "correction-invoice": "invoices.typeCorrectionInvoice",
+}
 
 const typeTone: Record<InvoiceDocumentType, Tone> = {
   "account-notice": "neutral",
@@ -23,6 +31,9 @@ const typeTone: Record<InvoiceDocumentType, Tone> = {
 
 /** Счета и счета-фактуры за текущий год (GET /invoices) с загрузкой PDF. */
 export default function InvoicesPage() {
+  const {t} = useI18n()
+  const typeName = (inv: Invoice) =>
+    inv.document_type && typeLabel[inv.document_type] ? t(typeLabel[inv.document_type]) : inv.document_type_label
   const {data, error, loading, reload} = useApi(() => invoicesApi.list())
   const [downloading, setDownloading] = useState<number | null>(null)
 
@@ -32,7 +43,7 @@ export default function InvoicesPage() {
       saveFile(await invoicesApi.downloadPdf(inv.id))
     } catch (e) {
       // ошибка blob-ответа приходит как Blob — текст бэка недоступен, поэтому общий fallback
-      toast.error(errMsg(e, "Не удалось скачать документ. Попробуйте позже."))
+      toast.error(errMsg(e, t("invoices.downloadFailed")))
     } finally {
       setDownloading(null)
     }
@@ -46,22 +57,18 @@ export default function InvoicesPage() {
 
   return (
     <Page
-      title="Документы"
-      description="Счета и счета-фактуры с начала текущего года"
+      title={t("invoices.title")}
+      description={t("invoices.description")}
       illustration={<LottieAnimation src="/videos/documents.json" />}
     >
       <Card>
-        <CardHeader title="Документы" />
+        <CardHeader title={t("invoices.title")} />
         {error ? (
           <ErrorState error={error} onRetry={reload} />
         ) : loading && !data ? (
           <ListSkeleton />
         ) : !data?.length ? (
-          <EmptyState
-            icon={FileText}
-            title="Документов пока нет"
-            description="Здесь появятся счета и счета-фактуры за текущий год."
-          />
+          <EmptyState icon={FileText} title={t("invoices.emptyTitle")} description={t("invoices.emptyDescription")} />
         ) : (
           <>
             <div className="hidden md:block">
@@ -69,9 +76,9 @@ export default function InvoicesPage() {
                 <TableHeader>
                   <TableRow>
                     <TableHead className="pl-5">№</TableHead>
-                    <TableHead>Тип</TableHead>
-                    <TableHead>Период</TableHead>
-                    <TableHead className="text-right">Сумма</TableHead>
+                    <TableHead>{t("invoices.colType")}</TableHead>
+                    <TableHead>{t("invoices.colPeriod")}</TableHead>
+                    <TableHead className="text-right">{t("invoices.colAmount")}</TableHead>
                     <TableHead className="pr-5 text-right" />
                   </TableRow>
                 </TableHeader>
@@ -80,9 +87,9 @@ export default function InvoicesPage() {
                     <TableRow key={inv.id}>
                       <TableCell className="pl-5 font-medium">{inv.number}</TableCell>
                       <TableCell>
-                        {inv.document_type_label ? (
+                        {typeName(inv) ? (
                           <Badge tone={inv.document_type ? typeTone[inv.document_type] : "neutral"}>
-                            {inv.document_type_label}
+                            {typeName(inv)}
                           </Badge>
                         ) : (
                           "—"
@@ -108,7 +115,7 @@ export default function InvoicesPage() {
                   <div className="min-w-0 flex-1">
                     <p className="font-medium">№ {inv.number}</p>
                     <p className="text-muted-foreground text-xs">
-                      {inv.document_type_label ?? "Документ"} · {formatDate(inv.period_start)} —{" "}
+                      {typeName(inv) ?? t("invoices.document")} · {formatDate(inv.period_start)} —{" "}
                       {formatDate(inv.period_end)}
                     </p>
                     <p className="mt-1 text-sm font-semibold tabular-nums">{formatMoney(inv.amount)}</p>

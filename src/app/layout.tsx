@@ -4,15 +4,17 @@ import {cookies} from "next/headers"
 import {ThemeRegistry} from "./components/layout/ThemeRegistry"
 import {TooltipProvider} from "@/components/ui/tooltip"
 import {Toaster} from "@/components/ui/sonner"
+import {I18nProvider} from "@/i18n"
+import {getServerLocale} from "@/i18n/server"
+import {translate} from "@/i18n/core"
 import {cn} from "@/lib/utils"
 import "./globals.css"
 
 const geist = Geist({subsets: ["latin"], variable: "--font-sans"})
 
-export const metadata: Metadata = {
-  title: "Личный кабинет",
-  description: "Личный кабинет",
-  icons: {icon: "/icon.svg"},
+export async function generateMetadata(): Promise<Metadata> {
+  const title = translate(await getServerLocale(), "common.appName")
+  return {title, description: title, icons: {icon: "/icon.svg"}}
 }
 
 /**
@@ -26,19 +28,22 @@ export default async function RootLayout({
 }>) {
   const cookieStore = await cookies()
   const isDark = cookieStore.get("theme")?.value === "dark"
+  const locale = await getServerLocale()
 
   return (
     <html
-      lang="ru"
+      lang={locale}
       data-theme={isDark ? "dark" : "light"}
       suppressHydrationWarning
       className={cn("font-sans", geist.variable)}
     >
       <body suppressHydrationWarning>
-        <ThemeRegistry initialDark={isDark}>
-          <TooltipProvider>{children}</TooltipProvider>
-          <Toaster position="bottom-center" richColors />
-        </ThemeRegistry>
+        <I18nProvider initial={locale}>
+          <ThemeRegistry initialDark={isDark}>
+            <TooltipProvider>{children}</TooltipProvider>
+            <Toaster position="bottom-center" richColors />
+          </ThemeRegistry>
+        </I18nProvider>
       </body>
     </html>
   )

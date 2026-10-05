@@ -6,6 +6,7 @@
  */
 import axios from "axios"
 import type {Message, ValidationError} from "./types"
+import {tr} from "@/i18n"
 
 export interface ApiError {
   /** `null` — ответа не было (сеть, CORS, таймаут). */
@@ -17,12 +18,12 @@ export interface ApiError {
   retryAfter: number | null
 }
 
-export function parseApiError(err: unknown, fallback = "Что-то пошло не так"): ApiError {
+export function parseApiError(err: unknown, fallback = tr("common.genericError")): ApiError {
   if (axios.isAxiosError<Partial<Message & ValidationError>>(err)) {
     const retry = Number(err.response?.headers?.["retry-after"])
     return {
       status: err.response?.status ?? null,
-      message: err.response ? (err.response.data?.message ?? fallback) : "Нет соединения с сервером",
+      message: err.response ? (err.response.data?.message ?? fallback) : tr("common.noConnection"),
       errors: err.response?.data?.errors ?? {},
       retryAfter: Number.isFinite(retry) ? retry : null,
     }

@@ -15,6 +15,7 @@ import {errFields, errMsg, errStatus, ticketsApi} from "@/lib/api"
 import {useApi} from "@/lib/hooks/useApi"
 import {useAuthStore} from "@/lib/stores/authStore"
 import {cn} from "@/lib/utils"
+import {useI18n} from "@/i18n"
 
 /** `datetime-local` (`2026-09-30T10:15`) → формат API со смещением Алматы. */
 const toApiDateTime = (v: string) => (v ? `${v}:00+05:00` : undefined)
@@ -29,6 +30,7 @@ function nowLocal() {
 /** Создание заявки. Справочники берём с бэка (`GET /tickets/options`). */
 export default function NewTicketPage() {
   const router = useRouter()
+  const {t} = useI18n()
   const user = useAuthStore((s) => s.user)
   const {data: options, error: optionsError, reload} = useApi(() => ticketsApi.getFormOptions())
 
@@ -80,12 +82,12 @@ export default function NewTicketPage() {
         detected_at: toApiDateTime(form.detected_at) ?? "",
         downtime_started_at: toApiDateTime(form.downtime_started_at) ?? null,
       })
-      toast.success(`Заявка ${ticket.number} создана.`)
+      toast.success(t("tickets.created", {number: ticket.number}))
       router.push(`/tickets/${ticket.id}`)
     } catch (e) {
       const fields = errFields(e)
       if (errStatus(e) === 422 && Object.keys(fields).length) setErrors(fields)
-      else toast.error(errMsg(e, "Не удалось создать заявку."))
+      else toast.error(errMsg(e, t("tickets.createFailed")))
     } finally {
       setSaving(false)
     }
@@ -93,11 +95,11 @@ export default function NewTicketPage() {
 
   return (
     <Page
-      title="Новая заявка"
-      description="Опишите проблему — мы передадим её инженерам"
+      title={t("tickets.newTitle")}
+      description={t("tickets.newDescription")}
       actions={
         <Button variant="ghost" render={<Link href="/tickets" />} nativeButton={false}>
-          <ArrowLeft /> К списку
+          <ArrowLeft /> {t("tickets.toList")}
         </Button>
       }
     >
@@ -113,9 +115,9 @@ export default function NewTicketPage() {
           )}
 
           <Card>
-            <CardHeader title="Проблема" />
+            <CardHeader title={t("tickets.sectionProblem")} />
             <div className="grid gap-4 p-5 md:grid-cols-2">
-              <Field label="Тема" required error={err("subject")} className="md:col-span-2">
+              <Field label={t("tickets.fieldSubject")} required error={err("subject")} className="md:col-span-2">
                 <Input
                   value={form.subject}
                   maxLength={255}
@@ -124,7 +126,7 @@ export default function NewTicketPage() {
                 />
               </Field>
 
-              <Field label="Характер проблемы" required error={err("symptom_id")}>
+              <Field label={t("tickets.fieldSymptom")} required error={err("symptom_id")}>
                 {options ? (
                   <SelectField
                     value={form.symptom_id}
@@ -137,7 +139,7 @@ export default function NewTicketPage() {
                 )}
               </Field>
 
-              <Field label="Филиал" required error={err("branch_id")}>
+              <Field label={t("tickets.fieldBranch")} required error={err("branch_id")}>
                 {options ? (
                   <SelectField
                     value={form.branch_id}
@@ -150,12 +152,12 @@ export default function NewTicketPage() {
                 )}
               </Field>
 
-              <Field label="Услуги" required error={servicesError} className="md:col-span-2">
+              <Field label={t("tickets.fieldServices")} required error={servicesError} className="md:col-span-2">
                 {options ? (
                   <div className="flex flex-col gap-3">
                     {[
-                      {title: "Основные", list: options.services},
-                      {title: "Дополнительные", list: options.additional_services},
+                      {title: t("tickets.servicesMain"), list: options.services},
+                      {title: t("tickets.servicesAdditional"), list: options.additional_services},
                     ]
                       .filter((g) => g.list.length)
                       .map((g) => (
@@ -191,7 +193,12 @@ export default function NewTicketPage() {
                 )}
               </Field>
 
-              <Field label="Описание" required error={err("description")} className="md:col-span-2">
+              <Field
+                label={t("tickets.fieldDescription")}
+                required
+                error={err("description")}
+                className="md:col-span-2"
+              >
                 <Textarea
                   rows={5}
                   value={form.description}
@@ -201,12 +208,12 @@ export default function NewTicketPage() {
                 />
               </Field>
 
-              <Field label="Ресурс" error={err("resource")} hint="IP-адрес, адрес подключения и т.п.">
+              <Field label={t("tickets.fieldResource")} error={err("resource")} hint={t("tickets.resourceHint")}>
                 <Input value={form.resource} maxLength={255} onChange={(e) => set("resource")(e.target.value)} />
               </Field>
 
               <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Проблема обнаружена" required error={err("detected_at")}>
+                <Field label={t("tickets.fieldDetectedAt")} required error={err("detected_at")}>
                   <Input
                     type="datetime-local"
                     value={form.detected_at}
@@ -215,7 +222,7 @@ export default function NewTicketPage() {
                     aria-invalid={!!err("detected_at")}
                   />
                 </Field>
-                <Field label="Начало простоя" error={err("downtime_started_at")}>
+                <Field label={t("tickets.fieldDowntimeStart")} error={err("downtime_started_at")}>
                   <Input
                     type="datetime-local"
                     value={form.downtime_started_at}
@@ -228,9 +235,9 @@ export default function NewTicketPage() {
           </Card>
 
           <Card>
-            <CardHeader title="Контактное лицо" />
+            <CardHeader title={t("tickets.sectionContact")} />
             <div className="grid gap-4 p-5 md:grid-cols-3">
-              <Field label="Имя" required error={err("contact_name")}>
+              <Field label={t("tickets.fieldName")} required error={err("contact_name")}>
                 <Input
                   value={contactValue("contact_name")}
                   maxLength={255}
@@ -238,7 +245,7 @@ export default function NewTicketPage() {
                   aria-invalid={!!err("contact_name")}
                 />
               </Field>
-              <Field label="Телефон" required error={err("contact_phone")}>
+              <Field label={t("tickets.fieldPhone")} required error={err("contact_phone")}>
                 <Input
                   type="tel"
                   value={contactValue("contact_phone")}
@@ -247,7 +254,7 @@ export default function NewTicketPage() {
                   aria-invalid={!!err("contact_phone")}
                 />
               </Field>
-              <Field label="Email" required error={err("contact_email")}>
+              <Field label={t("tickets.fieldEmail")} required error={err("contact_email")}>
                 <Input
                   type="email"
                   value={contactValue("contact_email")}
@@ -261,10 +268,10 @@ export default function NewTicketPage() {
 
           <div className="flex justify-end gap-2">
             <Button variant="outline" className="h-10 px-4" render={<Link href="/tickets" />} nativeButton={false}>
-              Отмена
+              {t("tickets.cancel")}
             </Button>
             <Button type="submit" disabled={saving} className="bg-brand hover:bg-brand/90 h-10 px-5 text-white">
-              {saving ? "Отправка…" : "Создать заявку"}
+              {saving ? t("tickets.sending") : t("tickets.createTicket")}
             </Button>
           </div>
         </form>

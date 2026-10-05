@@ -4,11 +4,12 @@ import Link from "next/link"
 import {useRouter} from "next/navigation"
 import {ArrowLeft, Compass, Home, User} from "lucide-react"
 import {Button} from "@/components/ui/button"
+import {useI18n, type MessageKey} from "@/i18n"
 
 /** Куда увести пользователя с 404 — основные разделы кабинета. */
-const SECTIONS = [
-  {href: "/", icon: Home, label: "Главная", hint: "Стартовая страница"},
-  {href: "/profile", icon: User, label: "Профиль", hint: "Данные аккаунта"},
+const SECTIONS: {href: string; icon: typeof Home; label: MessageKey; hint: MessageKey}[] = [
+  {href: "/", icon: Home, label: "auth.notFoundHome", hint: "auth.notFoundHomeHint"},
+  {href: "/profile", icon: User, label: "auth.notFoundProfile", hint: "auth.notFoundProfileHint"},
 ]
 
 /**
@@ -20,6 +21,7 @@ const SECTIONS = [
  */
 export default function NotFound() {
   const router = useRouter()
+  const {t} = useI18n()
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden px-6 py-12">
@@ -29,7 +31,7 @@ export default function NotFound() {
         <div className="animate-aurora-3 bg-brand/15 absolute -bottom-1/4 left-1/4 size-[45vmax] rounded-full blur-[120px] dark:bg-violet-500/15" />
       </div>
 
-      <div className="sm:bg-card/60 sm:border-border/60 relative w-full max-w-2xl sm:rounded-3xl sm:border sm:p-12 sm:shadow-2xl sm:shadow-black/10 sm:backdrop-blur-xl sm:dark:bg-card/40 sm:dark:shadow-black/40">
+      <div className="sm:bg-card/60 sm:border-border/60 sm:dark:bg-card/40 relative w-full max-w-2xl sm:rounded-3xl sm:border sm:p-12 sm:shadow-2xl sm:shadow-black/10 sm:backdrop-blur-xl sm:dark:shadow-black/40">
         <div className="flex flex-col items-center text-center">
           <span className="bg-brand/10 mb-6 flex size-16 items-center justify-center rounded-2xl">
             <Compass className="text-brand size-8" />
@@ -39,11 +41,8 @@ export default function NotFound() {
             404
           </p>
 
-          <h1 className="mt-4 text-2xl font-bold tracking-tight">Страница не найдена</h1>
-          <p className="text-muted-foreground mt-2 max-w-md text-[15px] leading-relaxed">
-            Адрес введён с ошибкой, или страницу переместили. Проверьте ссылку — либо перейдите в нужный раздел
-            ниже.
-          </p>
+          <h1 className="mt-4 text-2xl font-bold tracking-tight">{t("auth.notFoundTitle")}</h1>
+          <p className="text-muted-foreground mt-2 max-w-md text-[15px] leading-relaxed">{t("auth.notFoundText")}</p>
 
           <div className="mt-8 grid w-full grid-cols-1 gap-2.5 sm:grid-cols-2">
             {SECTIONS.map(({href, icon: Icon, label, hint}) => (
@@ -57,9 +56,9 @@ export default function NotFound() {
                 </span>
                 <span className="min-w-0">
                   <span className="group-hover:text-brand block text-sm font-semibold transition-colors">
-                    {label}
+                    {t(label)}
                   </span>
-                  <span className="text-muted-foreground block truncate text-xs">{hint}</span>
+                  <span className="text-muted-foreground block truncate text-xs">{t(hint)}</span>
                 </span>
               </Link>
             ))}
@@ -73,14 +72,14 @@ export default function NotFound() {
               className="flex h-12 items-center gap-2 px-7 text-[15px] font-semibold max-sm:w-full sm:min-w-40"
             >
               <ArrowLeft className="size-4" />
-              Назад
+              {t("auth.back")}
             </Button>
             <Button
               size="lg"
               onClick={() => router.push("/")}
               className="bg-brand hover:bg-brand/90 h-12 px-7 text-[15px] font-semibold text-white max-sm:w-full sm:min-w-40"
             >
-              На главную
+              {t("auth.toHome")}
             </Button>
           </div>
         </div>

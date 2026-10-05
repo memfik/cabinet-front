@@ -1,0 +1,62 @@
+import {defineNamespace} from "./types"
+
+export default defineNamespace({
+  refresh: {ru: "Обновить", en: "Refresh", kk: "Жаңарту"},
+  staleError: {
+    ru: "Не удалось обновить, показаны прежние данные",
+    en: "Could not refresh, showing previous data",
+    kk: "Жаңарту мүмкін болмады, алдыңғы деректер көрсетілген",
+  },
+  weatherTitle: {ru: "Погода · {city}", en: "Weather · {city}", kk: "Ауа райы · {city}"},
+  city: {ru: "Алматы", en: "Almaty", kk: "Алматы"},
+  weatherError: {
+    ru: "Не удалось загрузить погоду",
+    en: "Could not load the weather",
+    kk: "Ауа райын жүктеу мүмкін болмады",
+  },
+  wmoClear: {ru: "Ясно", en: "Clear", kk: "Ашық"},
+  wmoPartlyCloudy: {ru: "Переменная облачность", en: "Partly cloudy", kk: "Құбылмалы бұлтты"},
+  wmoOvercast: {ru: "Пасмурно", en: "Overcast", kk: "Бұлтты"},
+  wmoFog: {ru: "Туман", en: "Fog", kk: "Тұман"},
+  wmoDrizzle: {ru: "Морось", en: "Drizzle", kk: "Сіркіреген жаңбыр"},
+  wmoRain: {ru: "Дождь", en: "Rain", kk: "Жаңбыр"},
+  wmoSnow: {ru: "Снег", en: "Snow", kk: "Қар"},
+  wmoThunderstorm: {ru: "Гроза", en: "Thunderstorm", kk: "Найзағай"},
+  wmoCloudy: {ru: "Облачно", en: "Cloudy", kk: "Бұлтты"},
+  feelsLike: {ru: "Ощущается как {temp}", en: "Feels like {temp}", kk: "Сезілуі {temp}"},
+  dayNight: {
+    ru: "Днём {day} · ночью {night}",
+    en: "Day {day} · night {night}",
+    kk: "Күндіз {day} · түнде {night}",
+  },
+  windSpeed: {ru: "{value} м/с", en: "{value} m/s", kk: "{value} м/с"},
+  currencyTitle: {ru: "Курс валют", en: "Exchange rates", kk: "Валюта бағамы"},
+  currencyError: {
+    ru: "Не удалось загрузить курсы",
+    en: "Could not load exchange rates",
+    kk: "Бағамдарды жүктеу мүмкін болмады",
+  },
+  currencyUpdated: {
+    ru: "Обновлено {date} · рыночный курс, не официальный",
+    en: "Updated {date} · market rate, not official",
+    kk: "Жаңартылды {date} · нарықтық бағам, ресми емес",
+  },
+  accountTitle: {ru: "Мой счёт", en: "My account", kk: "Менің шотым"},
+  accountError: {ru: "Не удалось загрузить данные", en: "Could not load data", kk: "Деректерді жүктеу мүмкін болмады"},
+  noContract: {
+    ru: "К учётной записи не привязан лицевой счёт.",
+    en: "No account is linked to your profile.",
+    kk: "Тіркелгіге жеке шот байланыстырылмаған.",
+  },
+  debt: {ru: "Задолженность", en: "Debt", kk: "Берешек"},
+  balance: {ru: "Баланс", en: "Balance", kk: "Баланс"},
+  account: {ru: "Лицевой счёт", en: "Account", kk: "Жеке шот"},
+  activeServices: {ru: "Активных услуг", en: "Active services", kk: "Белсенді қызметтер"},
+  servicesCount: {
+    ru: ["{n} услуга", "{n} услуги", "{n} услуг"],
+    en: ["{n} service", "{n} services", "{n} services"],
+    kk: "{n} қызмет",
+  },
+  manager: {ru: "Менеджер", en: "Manager", kk: "Менеджер"},
+  payments: {ru: "История платежей", en: "Payment history", kk: "Төлемдер тарихы"},
+})

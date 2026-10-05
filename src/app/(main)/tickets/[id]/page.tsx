@@ -17,16 +17,21 @@ import {useApi} from "@/lib/hooks/useApi"
 import {useAuthStore} from "@/lib/stores/authStore"
 import {formatDateTime} from "@/lib/format"
 import {cn} from "@/lib/utils"
+import {tr, useI18n} from "@/i18n"
 import {TicketStatusBadge} from "../TicketStatusBadge"
 
 const MAX_FILES = 5
 const MAX_SIZE = 1953 * 1024
 const ALLOWED = "pdf jpg jpeg png gif txt csv doc docx xls xlsx odt ods zip rar 7z log".split(" ")
 
-const sizeLabel = (b: number) => (b >= 1024 * 1024 ? `${(b / 1024 / 1024).toFixed(1)} МБ` : `${Math.ceil(b / 1024)} КБ`)
+const sizeLabel = (b: number) =>
+  b >= 1024 * 1024
+    ? `${(b / 1024 / 1024).toFixed(1)} ${tr("tickets.sizeMb")}`
+    : `${Math.ceil(b / 1024)} ${tr("tickets.sizeKb")}`
 
 /** Вложения письма: доступные скачиваются с токеном, недоступные (слишком большие) показываются без ссылки. */
 function AttachmentList({ticketId, attachments}: {ticketId: number; attachments: TicketAttachment[]}) {
+  const {t} = useI18n()
   const [downloading, setDownloading] = useState<number | null>(null)
 
   async function download(a: TicketAttachment) {
@@ -34,7 +39,7 @@ function AttachmentList({ticketId, attachments}: {ticketId: number; attachments:
     try {
       saveFile(await ticketsApi.downloadAttachment(ticketId, a))
     } catch (e) {
-      toast.error(errMsg(e, "Не удалось скачать файл. Попробуйте позже."))
+      toast.error(errMsg(e, t("tickets.downloadFailed")))
     } finally {
       setDownloading(null)
     }
@@ -53,16 +58,18 @@ function AttachmentList({ticketId, attachments}: {ticketId: number; attachments:
             >
               {downloading === a.id ? <Loader2 className="size-3.5 animate-spin" /> : <Download className="size-3.5" />}
               <span className="truncate">{a.name}</span>
-              {a.size_kb != null && <span className="text-muted-foreground shrink-0">{sizeLabel(a.size_kb * 1024)}</span>}
+              {a.size_kb != null && (
+                <span className="text-muted-foreground shrink-0">{sizeLabel(a.size_kb * 1024)}</span>
+              )}
             </button>
           ) : (
             <span
-              title="Файл слишком большой и не сохранён"
+              title={t("tickets.fileTooLarge")}
               className="border-border text-muted-foreground flex max-w-full items-center gap-1.5 rounded-lg border border-dashed px-2.5 py-1.5 text-xs"
             >
               <Paperclip className="size-3.5" />
               <span className="truncate">{a.name}</span>
-              <span className="shrink-0">· не сохранён</span>
+              <span className="shrink-0">· {t("tickets.notSaved")}</span>
             </span>
           )}
         </li>
@@ -73,21 +80,22 @@ function AttachmentList({ticketId, attachments}: {ticketId: number; attachments:
 
 /** Заявка: реквизиты, описание, переписка и форма ответа. */
 export default function TicketPage() {
+  const {t} = useI18n()
   const {id} = useParams<{id: string}>()
   const {data: ticket, error, reload} = useApi(() => ticketsApi.get(Number(id)), [id])
 
   if (error && !ticket) {
     return (
-      <Page title="Заявка">
+      <Page title={t("tickets.ticketTitle")}>
         <Card>
           {error.status === 404 ? (
             <EmptyState
               icon={SearchX}
-              title="Заявка не найдена"
+              title={t("tickets.notFound")}
               description={error.message}
               action={
                 <Button variant="outline" render={<Link href="/tickets" />} nativeButton={false}>
-                  К списку заявок
+                  {t("tickets.toTicketList")}
                 </Button>
               }
             />
@@ -101,7 +109,7 @@ export default function TicketPage() {
 
   if (!ticket) {
     return (
-      <Page title="Заявка">
+      <Page title={t("tickets.ticketTitle")}>
         <div className="flex flex-col gap-4">
           <Skeleton className="h-40" />
           <Skeleton className="h-64" />
@@ -118,7 +126,7 @@ export default function TicketPage() {
         <>
           <TicketStatusBadge status={ticket.status} />
           <Button variant="ghost" render={<Link href="/tickets" />} nativeButton={false}>
-            <ArrowLeft /> К списку
+            <ArrowLeft /> {t("tickets.toList")}
           </Button>
         </>
       }
@@ -127,7 +135,7 @@ export default function TicketPage() {
         <div className="flex min-w-0 flex-col gap-4">
           {ticket.description && (
             <Card>
-              <CardHeader title="Описание" />
+              <CardHeader title={t("tickets.sectionDescription")} />
               <p className="px-5 py-4 text-sm whitespace-pre-wrap">{ticket.description}</p>
             </Card>
           )}
@@ -135,9 +143,9 @@ export default function TicketPage() {
           <ReplyForm ticket={ticket} onSent={reload} />
 
           <Card>
-            <CardHeader title={`Переписка (${ticket.messages.length})`} />
+            <CardHeader title={t("tickets.conversation", {n: ticket.messages.length})} />
             {ticket.messages.length === 0 ? (
-              <EmptyState title="Сообщений пока нет" description="Ответ исполнителя появится здесь." />
+              <EmptyState title={t("tickets.noMessages")} description={t("tickets.replyWillAppear")} />
             ) : (
               <ul className="flex flex-col gap-3 p-4">
                 {ticket.messages.map((m) => (
@@ -151,11 +159,14 @@ export default function TicketPage() {
                       <div className="mb-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs">
                         <span className="font-semibold">{m.from_name ?? m.from_email ?? "—"}</span>
                         <Badge tone={m.from_staff ? "neutral" : "brand"} className="px-2 py-0 text-[11px]">
-                          {m.from_staff ? "Поддержка" : "Вы"}
+                          {m.from_staff ? t("tickets.support") : t("tickets.you")}
                         </Badge>
                         <span className="text-muted-foreground">{formatDateTime(m.sent_at)}</span>
                         {m.has_attachments && (
-                          <Paperclip className="text-muted-foreground size-3.5" aria-label="Есть вложения" />
+                          <Paperclip
+                            className="text-muted-foreground size-3.5"
+                            aria-label={t("tickets.hasAttachments")}
+                          />
                         )}
                       </div>
                       {/* body уже очищен на сервере — безопасно вставлять как HTML */}
@@ -180,19 +191,23 @@ export default function TicketPage() {
 
 /** Реквизиты заявки. */
 function Details({ticket}: {ticket: TicketDetails}) {
+  const {t} = useI18n()
   const rows: [string, React.ReactNode][] = [
-    ["Создана", formatDateTime(ticket.created_at)],
-    ["Контакт", [ticket.contact.name, ticket.contact.phone, ticket.contact.email].filter(Boolean).join(", ") || "—"],
-    ["Филиал", ticket.branch ?? "—"],
-    ["Характер проблемы", ticket.symptom ?? "—"],
-    ["Услуги", [...ticket.services, ...ticket.additional_services].join(", ") || "—"],
-    ["Ресурс", ticket.resource ?? "—"],
-    ["Обнаружена", formatDateTime(ticket.reacted_at)],
-    ["Начало простоя", formatDateTime(ticket.downtime_started_at)],
+    [t("tickets.detCreated"), formatDateTime(ticket.created_at)],
+    [
+      t("tickets.detContact"),
+      [ticket.contact.name, ticket.contact.phone, ticket.contact.email].filter(Boolean).join(", ") || "—",
+    ],
+    [t("tickets.detBranch"), ticket.branch ?? "—"],
+    [t("tickets.detSymptom"), ticket.symptom ?? "—"],
+    [t("tickets.detServices"), [...ticket.services, ...ticket.additional_services].join(", ") || "—"],
+    [t("tickets.detResource"), ticket.resource ?? "—"],
+    [t("tickets.detDetected"), formatDateTime(ticket.reacted_at)],
+    [t("tickets.detDowntime"), formatDateTime(ticket.downtime_started_at)],
   ]
   return (
     <Card className="h-fit">
-      <CardHeader title="Реквизиты" />
+      <CardHeader title={t("tickets.sectionDetails")} />
       <dl className="divide-border divide-y text-sm">
         {rows.map(([k, v]) => (
           <div key={k} className="px-5 py-3">
@@ -207,6 +222,7 @@ function Details({ticket}: {ticket: TicketDetails}) {
 
 /** Ответ в заявку: multipart с вложениями (до 5 файлов по 1953 КБ). */
 function ReplyForm({ticket, onSent}: {ticket: TicketDetails; onSent: () => void}) {
+  const {t} = useI18n()
   const user = useAuthStore((s) => s.user)
   const fileRef = useRef<HTMLInputElement>(null)
   const [subjectEdit, setSubjectEdit] = useState<string | null>(null)
@@ -227,9 +243,9 @@ function ReplyForm({ticket, onSent}: {ticket: TicketDetails; onSent: () => void}
     const next = [...files]
     for (const f of Array.from(list)) {
       const ext = f.name.split(".").pop()?.toLowerCase() ?? ""
-      if (!ALLOWED.includes(ext)) problems.push(`«${f.name}»: тип файла не поддерживается`)
-      else if (f.size > MAX_SIZE) problems.push(`«${f.name}»: больше 1953 КБ`)
-      else if (next.length >= MAX_FILES) problems.push(`Не больше ${MAX_FILES} файлов`)
+      if (!ALLOWED.includes(ext)) problems.push(t("tickets.fileTypeUnsupported", {name: f.name}))
+      else if (f.size > MAX_SIZE) problems.push(t("tickets.fileOverSize", {name: f.name}))
+      else if (next.length >= MAX_FILES) problems.push(t("tickets.maxFiles", {max: MAX_FILES}))
       else next.push(f)
     }
     setFiles(next)
@@ -248,14 +264,14 @@ function ReplyForm({ticket, onSent}: {ticket: TicketDetails; onSent: () => void}
         sender_name: senderName || null,
         attachments: files,
       })
-      toast.success("Сообщение отправлено.")
+      toast.success(t("tickets.sent"))
       setMessage("")
       setFiles([])
       onSent()
     } catch (e) {
       const fields = errFields(e)
       if (errStatus(e) === 422 && Object.keys(fields).length) setErrors(fields)
-      else toast.error(errMsg(e, "Не удалось отправить сообщение."))
+      else toast.error(errMsg(e, t("tickets.sendFailed")))
     } finally {
       setSending(false)
     }
@@ -263,10 +279,10 @@ function ReplyForm({ticket, onSent}: {ticket: TicketDetails; onSent: () => void}
 
   return (
     <Card>
-      <CardHeader title="Написать в заявку" />
+      <CardHeader title={t("tickets.replyTitle")} />
       <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-5">
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Тема" required error={err("subject")}>
+          <Field label={t("tickets.fieldSubject")} required error={err("subject")}>
             <Input
               value={subject}
               maxLength={255}
@@ -274,7 +290,7 @@ function ReplyForm({ticket, onSent}: {ticket: TicketDetails; onSent: () => void}
               aria-invalid={!!err("subject")}
             />
           </Field>
-          <Field label="Ваше имя" error={err("sender_name")} hint="Необязательно">
+          <Field label={t("tickets.fieldYourName")} error={err("sender_name")} hint={t("tickets.optional")}>
             <Input
               value={senderName}
               maxLength={255}
@@ -284,7 +300,7 @@ function ReplyForm({ticket, onSent}: {ticket: TicketDetails; onSent: () => void}
           </Field>
         </div>
 
-        <Field label="Сообщение" required error={err("message")}>
+        <Field label={t("tickets.fieldMessage")} required error={err("message")}>
           <Textarea
             rows={4}
             value={message}
@@ -294,7 +310,7 @@ function ReplyForm({ticket, onSent}: {ticket: TicketDetails; onSent: () => void}
           />
         </Field>
 
-        <Field error={fileError} hint={`До ${MAX_FILES} файлов по 1953 КБ: ${ALLOWED.join(", ")}`}>
+        <Field error={fileError} hint={t("tickets.filesHint", {max: MAX_FILES, types: ALLOWED.join(", ")})}>
           <input
             ref={fileRef}
             type="file"
@@ -310,7 +326,7 @@ function ReplyForm({ticket, onSent}: {ticket: TicketDetails; onSent: () => void}
               disabled={files.length >= MAX_FILES}
               onClick={() => fileRef.current?.click()}
             >
-              <Paperclip /> Прикрепить файлы
+              <Paperclip /> {t("tickets.attachFiles")}
             </Button>
             {files.map((f, i) => (
               <span
@@ -323,7 +339,7 @@ function ReplyForm({ticket, onSent}: {ticket: TicketDetails; onSent: () => void}
                   type="button"
                   onClick={() => setFiles((all) => all.filter((_, j) => j !== i))}
                   className="hover:bg-background rounded p-0.5"
-                  aria-label={`Убрать ${f.name}`}
+                  aria-label={t("tickets.removeFile", {name: f.name})}
                 >
                   <X className="size-3.5" />
                 </button>
@@ -338,7 +354,7 @@ function ReplyForm({ticket, onSent}: {ticket: TicketDetails; onSent: () => void}
             disabled={sending || !message.trim()}
             className="bg-brand hover:bg-brand/90 h-10 px-5 text-white"
           >
-            {sending ? "Отправка…" : "Отправить"}
+            {sending ? t("tickets.sending") : t("tickets.send")}
           </Button>
         </div>
       </form>

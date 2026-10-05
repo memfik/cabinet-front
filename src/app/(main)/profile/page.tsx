@@ -8,36 +8,38 @@ import {Input} from "@/components/ui/input"
 import {Page, Card, CardHeader} from "@/app/components/common/Page"
 import {Field} from "@/app/components/common/Field"
 import {ErrorBanner, NO_ERROR, firstError, handleFormError, type FormError} from "@/app/components/common/formError"
+import {useI18n, type MessageKey} from "@/i18n"
 import {authApi} from "@/lib/api/auth"
 import {useAuthStore} from "@/lib/stores/authStore"
 import {useProfileStore} from "@/lib/stores/profileStore"
 
 /** Профиль: данные пользователя и смена пароля. */
 export default function ProfilePage() {
+  const {t} = useI18n()
   // profile — свежий ответ /me, user — сохранённый при входе; берём свежий, если уже пришёл
   const profile = useProfileStore((s) => s.profile)
   const authUser = useAuthStore((s) => s.user)
   const me = profile ?? authUser
 
-  const rows: [string, string | null | undefined][] = [
-    ["Имя", [me?.first_name, me?.last_name].filter(Boolean).join(" ")],
-    ["Email", me?.email],
-    ["Логин", me?.username],
-    ["Должность", me?.position],
-    ["Телефон", me?.phone],
-    ["Лицевой счёт", me?.dogid],
-    ["Часовой пояс", me?.timezone],
+  const rows: [MessageKey, string | null | undefined][] = [
+    ["profile.name", [me?.first_name, me?.last_name].filter(Boolean).join(" ")],
+    ["profile.email", me?.email],
+    ["profile.login", me?.username],
+    ["profile.position", me?.position],
+    ["profile.phone", me?.phone],
+    ["profile.account", me?.dogid],
+    ["profile.timezone", me?.timezone],
   ]
 
   return (
-    <Page title="Профиль">
+    <Page title={t("profile.title")}>
       <div className="space-y-6">
         <Card>
-          <CardHeader title="Данные пользователя" />
+          <CardHeader title={t("profile.userData")} />
           <dl className="grid grid-cols-1 gap-x-6 gap-y-3 p-5 text-sm sm:grid-cols-[180px_1fr]">
             {rows.map(([label, value]) => (
               <div key={label} className="contents">
-                <dt className="text-muted-foreground">{label}</dt>
+                <dt className="text-muted-foreground">{t(label)}</dt>
                 <dd className="font-medium wrap-break-word">{value || "—"}</dd>
               </div>
             ))}
@@ -45,7 +47,7 @@ export default function ProfilePage() {
         </Card>
 
         <Card>
-          <CardHeader title="Смена пароля" />
+          <CardHeader title={t("profile.changePassword")} />
           <PasswordForm />
         </Card>
       </div>
@@ -54,6 +56,7 @@ export default function ProfilePage() {
 }
 
 function PasswordForm() {
+  const {t} = useI18n()
   const [current, setCurrent] = useState("")
   const [password, setPassword] = useState("")
   const [confirmation, setConfirmation] = useState("")
@@ -66,7 +69,7 @@ function PasswordForm() {
     setErr(NO_ERROR)
     try {
       await authApi.changePassword({current_password: current, password, password_confirmation: confirmation})
-      toast.success("Пароль изменён. Остальные сессии завершены.")
+      toast.success(t("profile.passwordChanged"))
       setCurrent("")
       setPassword("")
       setConfirmation("")
@@ -80,7 +83,7 @@ function PasswordForm() {
   return (
     <form onSubmit={submit} className="space-y-4 p-5">
       <ErrorBanner message={err.banner} />
-      <Field label="Текущий пароль" required error={firstError(err, "current_password")}>
+      <Field label={t("profile.currentPassword")} required error={firstError(err, "current_password")}>
         <Input
           type="password"
           autoComplete="current-password"
@@ -91,10 +94,10 @@ function PasswordForm() {
       </Field>
       <div className="grid gap-4 sm:grid-cols-2">
         <Field
-          label="Новый пароль"
+          label={t("profile.newPassword")}
           required
           error={firstError(err, "password")}
-          hint="Не короче 8 символов, должен отличаться от текущего"
+          hint={t("profile.newPasswordHint")}
         >
           <Input
             type="password"
@@ -104,7 +107,7 @@ function PasswordForm() {
             aria-invalid={!!firstError(err, "password")}
           />
         </Field>
-        <Field label="Повтор нового пароля" required error={firstError(err, "password_confirmation")}>
+        <Field label={t("profile.confirmPassword")} required error={firstError(err, "password_confirmation")}>
           <Input
             type="password"
             autoComplete="new-password"
@@ -119,7 +122,7 @@ function PasswordForm() {
         disabled={saving || !current || !password}
         className="bg-brand hover:bg-brand/90 h-10 px-5 text-white"
       >
-        <KeyRound /> {saving ? "Сохранение…" : "Сменить пароль"}
+        <KeyRound /> {saving ? t("profile.saving") : t("profile.submit")}
       </Button>
     </form>
   )

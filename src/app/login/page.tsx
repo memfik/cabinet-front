@@ -9,6 +9,8 @@ import {Input} from "@/components/ui/input"
 import {Label} from "@/components/ui/label"
 import {LogoMark} from "@/app/components/common/LogoMark"
 import {useAppTheme} from "@/app/components/layout/ThemeContext"
+import {useI18n} from "@/i18n"
+import {LanguageSwitcher} from "@/i18n/ui/LanguageSwitcher"
 import {cn} from "@/lib/utils"
 import {authApi} from "@/lib/api/auth"
 import {saveToken} from "@/lib/api/client"
@@ -40,6 +42,7 @@ export default function LoginPage() {
 }
 
 function LoginForm() {
+  const {t} = useI18n()
   const router = useRouter()
   const next = safeNext(useSearchParams().get("next"))
   const {isDark, toggleTheme} = useAppTheme()
@@ -63,10 +66,10 @@ function LoginForm() {
       const data = await authApi.login({login, password})
       saveToken(data.token, data.expires_at)
       setAuth(data.user, data.token)
-      toast.success("Вы успешно вошли в систему.")
+      toast.success(t("auth.loginSuccess"))
       router.push(next)
     } catch (err: unknown) {
-      toast.error(errMsg(err, "Ошибка входа. Попробуйте снова."))
+      toast.error(errMsg(err, t("auth.loginError")))
     } finally {
       setLoading(false)
     }
@@ -86,11 +89,12 @@ function LoginForm() {
       </div>
 
       <div className="relative flex flex-1 items-center justify-center overflow-y-auto px-6 py-8 sm:px-12 lg:px-16">
+        <LanguageSwitcher variant="compact" className="absolute top-4 left-4 z-10" />
         <button
           type="button"
           onClick={(e) => toggleTheme(e)}
           className="text-muted-foreground hover:text-foreground absolute top-4 right-4 flex items-center gap-2 text-sm transition-colors"
-          aria-label="Сменить тему"
+          aria-label={t("auth.toggleTheme")}
         >
           {isDark ? <Sun className="size-6 text-yellow-400" /> : <Moon className="size-6" />}
           <div
@@ -110,15 +114,19 @@ function LoginForm() {
 
         <div className="sm:bg-card/60 sm:border-border/60 sm:dark:bg-card/40 w-full max-w-md sm:rounded-3xl sm:border sm:p-12 sm:shadow-2xl sm:shadow-black/10 sm:backdrop-blur-xl sm:dark:shadow-black/40">
           <div className="mb-10 flex justify-center">
-            <img src={isDark ? "/logo-white.png" : "/logo-black.png"} alt="Logo" className="h-14 object-contain" />
+            <img
+              src={isDark ? "/logo-white.png" : "/logo-black.png"}
+              alt={t("auth.logoAlt")}
+              className="h-14 object-contain"
+            />
           </div>
 
-          <h1 className="mb-1.5 text-center text-2xl font-bold">Добро пожаловать</h1>
-          <p className="text-muted-foreground mb-10 text-center text-[15px]">Введите данные для входа в кабинет</p>
+          <h1 className="mb-1.5 text-center text-2xl font-bold">{t("auth.welcome")}</h1>
+          <p className="text-muted-foreground mb-10 text-center text-[15px]">{t("auth.loginSubtitle")}</p>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-6">
             <div className="flex flex-col gap-2">
-              <Label className="text-[15px] font-medium">Логин</Label>
+              <Label className="text-[15px] font-medium">{t("auth.loginLabel")}</Label>
               <Input
                 type="text"
                 required
@@ -130,7 +138,7 @@ function LoginForm() {
             </div>
 
             <div className="flex flex-col gap-2">
-              <Label className="text-[15px] font-medium">Пароль</Label>
+              <Label className="text-[15px] font-medium">{t("auth.passwordLabel")}</Label>
               <div className="relative">
                 <Input
                   type={showPassword ? "text" : "password"}
@@ -145,6 +153,7 @@ function LoginForm() {
                   variant="ghost"
                   size="icon-xs"
                   onClick={() => setShowPassword((v) => !v)}
+                  aria-label={showPassword ? t("auth.hidePassword") : t("auth.showPassword")}
                   className="text-muted-foreground hover:text-foreground absolute top-1/2 right-2.5 -translate-y-1/2"
                 >
                   {showPassword ? <EyeOff className="size-4.5" /> : <Eye className="size-4.5" />}
@@ -154,7 +163,7 @@ function LoginForm() {
                 href="/forgot-password"
                 className="text-muted-foreground hover:text-brand self-end text-sm transition-colors"
               >
-                Забыли пароль?
+                {t("auth.forgot")}
               </Link>
             </div>
 
@@ -163,7 +172,7 @@ function LoginForm() {
               disabled={loading}
               className="bg-brand shadow-brand/30 hover:bg-brand/90 mt-1 h-auto w-full py-3 text-base font-semibold text-white shadow-lg disabled:opacity-60"
             >
-              {loading ? "Вход..." : "Войти"}
+              {loading ? t("auth.signingIn") : t("auth.signIn")}
             </Button>
           </form>
         </div>

@@ -9,10 +9,12 @@ import {EmptyState, ErrorState, ListSkeleton} from "@/app/components/common/Stat
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table"
 import {paymentsApi} from "@/lib/api/payments"
 import {useApi} from "@/lib/hooks/useApi"
+import {useI18n} from "@/i18n"
 import {daysAgoInput, formatDate, formatDateTime, formatMoney, toDateInput} from "@/lib/format"
 
 /** История платежей (GET /payments): период до 90 дней, по умолчанию последние 25. */
 export default function PaymentsPage() {
+  const {t} = useI18n()
   const [range, setRange] = useState({from: daysAgoInput(29), to: toDateInput(new Date())})
   const {data, error, loading, reload} = useApi(() => paymentsApi.getHistory(range), [range.from, range.to])
 
@@ -22,8 +24,8 @@ export default function PaymentsPage() {
 
   return (
     <Page
-      title="Платежи"
-      description="Зачисления на лицевой счёт. Период — не более 90 дней."
+      title={t("payments.title")}
+      description={t("payments.description")}
       illustration={<LottieAnimation src="/videos/payment.json" />}
     >
       <Card className="mb-4 p-4">
@@ -32,11 +34,11 @@ export default function PaymentsPage() {
 
       <Card>
         <CardHeader
-          title="Зачисления"
+          title={t("payments.credits")}
           actions={
             data && (
               <span className="text-sm">
-                <span className="text-muted-foreground">Итого: </span>
+                <span className="text-muted-foreground">{t("payments.total")}</span>
                 <span className="font-semibold tabular-nums">{formatMoney(data.total)}</span>
               </span>
             )
@@ -47,12 +49,12 @@ export default function PaymentsPage() {
         ) : loading && !data ? (
           <ListSkeleton />
         ) : !data || !data.has_contract ? (
-          <EmptyState icon={Wallet} title="Нет данных" description="У вас нет лицевого счёта, платежей нет." />
+          <EmptyState icon={Wallet} title={t("payments.noDataTitle")} description={t("payments.noDataDescription")} />
         ) : data.payments.length === 0 ? (
           <EmptyState
             icon={Wallet}
-            title="Платежей нет"
-            description={`За период ${formatDate(data.from)} — ${formatDate(data.to)}`}
+            title={t("payments.emptyTitle")}
+            description={t("payments.emptyPeriod", {from: formatDate(data.from), to: formatDate(data.to)})}
           />
         ) : (
           <div className={loading ? "opacity-60 transition-opacity" : "transition-opacity"}>
@@ -61,10 +63,10 @@ export default function PaymentsPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="pl-5">Дата</TableHead>
-                    <TableHead>Оператор</TableHead>
-                    <TableHead>Комментарий</TableHead>
-                    <TableHead className="pr-5 text-right">Сумма</TableHead>
+                    <TableHead className="pl-5">{t("payments.colDate")}</TableHead>
+                    <TableHead>{t("payments.colOperator")}</TableHead>
+                    <TableHead>{t("payments.colComment")}</TableHead>
+                    <TableHead className="pr-5 text-right">{t("payments.colAmount")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

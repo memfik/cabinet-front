@@ -15,11 +15,13 @@ import {Pagination} from "@/app/components/common/Pagination"
 import {ticketsApi} from "@/lib/api"
 import {useApi} from "@/lib/hooks/useApi"
 import {formatDateTime} from "@/lib/format"
+import {useI18n} from "@/i18n"
 import {TicketStatusBadge} from "./TicketStatusBadge"
 
 /** Список заявок договора: фильтры по номеру и периоду, страницы по 20. */
 export default function TicketsPage() {
   const router = useRouter()
+  const {t: tt} = useI18n()
   const [number, setNumber] = useState("")
   const [range, setRange] = useState({from: "", to: ""})
   const [page, setPage] = useState(1)
@@ -40,21 +42,21 @@ export default function TicketsPage() {
 
   return (
     <Page
-      title="Заявки (K-ticket)"
-      description="Обращения по проблемам с услугами"
+      title={tt("tickets.listTitle")}
+      description={tt("tickets.listDescription")}
       actions={
         <Button
           render={<Link href="/tickets/new" />}
           nativeButton={false}
           className="bg-brand hover:bg-brand/90 h-11 w-full px-3.5 text-white sm:h-9 sm:w-auto"
         >
-          <Plus /> Новая заявка
+          <Plus /> {tt("tickets.newTicket")}
         </Button>
       }
     >
       <Card className="mb-4 p-4">
         <div className="flex flex-wrap items-start gap-3">
-          <Field label="Номер заявки" className="w-full sm:w-auto">
+          <Field label={tt("tickets.numberLabel")} className="w-full sm:w-auto">
             <div className="relative">
               <Search className="text-muted-foreground absolute top-1/2 left-2.5 size-4 -translate-y-1/2" />
               <Input
@@ -87,7 +89,7 @@ export default function TicketsPage() {
                 setPage(1)
               }}
             >
-              Сбросить
+              {tt("tickets.reset")}
             </Button>
           )}
         </div>
@@ -100,14 +102,12 @@ export default function TicketsPage() {
           <ListSkeleton rows={6} />
         ) : tickets.length === 0 ? (
           <EmptyState
-            title={filtered ? "Ничего не найдено" : "Заявок пока нет"}
-            description={
-              filtered ? "Измените фильтры или сбросьте их." : "Создайте заявку, если возникла проблема с услугой."
-            }
+            title={filtered ? tt("tickets.nothingFound") : tt("tickets.noTickets")}
+            description={filtered ? tt("tickets.changeFilters") : tt("tickets.createIfProblem")}
             action={
               !filtered && (
                 <Button render={<Link href="/tickets/new" />} nativeButton={false} variant="outline">
-                  <Plus /> Новая заявка
+                  <Plus /> {tt("tickets.newTicket")}
                 </Button>
               )
             }
@@ -119,10 +119,10 @@ export default function TicketsPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="pl-5">Номер</TableHead>
-                    <TableHead>Тема</TableHead>
-                    <TableHead>Статус</TableHead>
-                    <TableHead className="pr-5 text-right">Создана</TableHead>
+                    <TableHead className="pl-5">{tt("tickets.colNumber")}</TableHead>
+                    <TableHead>{tt("tickets.colSubject")}</TableHead>
+                    <TableHead>{tt("tickets.colStatus")}</TableHead>
+                    <TableHead className="pr-5 text-right">{tt("tickets.colCreated")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

@@ -2,6 +2,7 @@
 
 import {usePathname, useRouter} from "next/navigation"
 import {MoreHorizontal} from "lucide-react"
+import {useI18n} from "@/i18n"
 import {cn} from "@/lib/utils"
 import {useAuthStore} from "@/lib/stores/authStore"
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu"
@@ -10,12 +11,14 @@ import {isNavActive, navItems} from "./nav"
 /** Сколько разделов показываем в ленте, остальные уходят в «Ещё». */
 const VISIBLE_COUNT = 4
 
-const itemClass = "flex flex-1 flex-col items-center justify-center gap-1 py-2 text-[11px] font-medium transition-colors"
+const itemClass =
+  "flex flex-1 flex-col items-center justify-center gap-1 py-2 text-[11px] font-medium transition-colors"
 
 /** Нижняя навигация — только в мобильной раскладке вместо меню шапки. Первые разделы в ленте, остальные — в меню «Ещё». */
 export function BottomNav() {
   const pathname = usePathname()
   const router = useRouter()
+  const {t} = useI18n()
   const isManager = useAuthStore((s) => s.user?.is_user_manager)
   const items = navItems.filter((i) => !i.managerOnly || isManager)
 
@@ -25,7 +28,7 @@ export function BottomNav() {
   const overflowActive = overflow.some((i) => isNavActive(pathname, i.href))
 
   return (
-    <nav className="bg-card border-border relative z-40 shrink-0 rounded-t-3xl border-t shadow-[0_-4px_16px_-8px_rgb(0_0_0/0.15)] pb-[env(safe-area-inset-bottom)] lg:hidden">
+    <nav className="bg-card border-border relative z-40 shrink-0 rounded-t-3xl border-t pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_16px_-8px_rgb(0_0_0/0.15)] lg:hidden">
       <div className="flex">
         {visible.map((item) => {
           const Icon = item.icon
@@ -34,10 +37,14 @@ export function BottomNav() {
             <button
               key={item.href}
               onClick={() => router.push(item.href)}
-              className={cn(itemClass, "min-w-0", active ? "text-brand" : "text-muted-foreground hover:text-foreground")}
+              className={cn(
+                itemClass,
+                "min-w-0",
+                active ? "text-brand" : "text-muted-foreground hover:text-foreground"
+              )}
             >
               <Icon className="size-5" />
-              <span className="w-full truncate text-center">{item.label}</span>
+              <span className="w-full truncate text-center">{t(item.labelKey)}</span>
             </button>
           )
         })}
@@ -56,7 +63,7 @@ export function BottomNav() {
               }
             >
               <MoreHorizontal className="size-5" />
-              Ещё
+              {t("shell.more")}
             </DropdownMenuTrigger>
             <DropdownMenuContent side="top" align="end" sideOffset={8} className="w-52 p-1">
               {overflow.map((item) => {
@@ -72,7 +79,7 @@ export function BottomNav() {
                     )}
                   >
                     <Icon className="size-4.5" />
-                    <span>{item.label}</span>
+                    <span>{t(item.labelKey)}</span>
                   </DropdownMenuItem>
                 )
               })}
