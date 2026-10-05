@@ -7,6 +7,7 @@ import {Eye, EyeOff, Sun, Moon} from "lucide-react"
 import {Button} from "@/components/ui/button"
 import {Input} from "@/components/ui/input"
 import {Label} from "@/components/ui/label"
+import {LogoMark} from "@/app/components/common/LogoMark"
 import {useAppTheme} from "@/app/components/layout/ThemeContext"
 import {cn} from "@/lib/utils"
 import {authApi} from "@/lib/api/auth"
@@ -81,6 +82,7 @@ function LoginForm() {
         <div className="animate-aurora-2 absolute top-1/4 -right-1/6 size-[50vmax] rounded-full bg-blue-500/20 blur-[120px] dark:bg-blue-500/15" />
         <div className="animate-aurora-3 bg-brand/15 absolute -bottom-1/4 left-1/4 size-[45vmax] rounded-full blur-[120px] dark:bg-indigo-500/15" />
         <div className="animate-aurora-4 bg-brand/10 absolute top-1/3 left-1/2 size-[40vmax] rounded-full blur-[120px] dark:bg-blue-400/10" />
+        <LogoMark className="text-brand absolute top-1/2 left-1/2 size-[min(130vmin,1000px)] -translate-x-1/2 -translate-y-1/2 opacity-20 dark:opacity-25" />
       </div>
 
       <div className="relative flex flex-1 items-center justify-center overflow-y-auto px-6 py-8 sm:px-12 lg:px-16">

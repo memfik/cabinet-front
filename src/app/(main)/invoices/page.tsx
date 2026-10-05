@@ -48,7 +48,7 @@ export default function InvoicesPage() {
     <Page
       title="Документы"
       description="Счета и счета-фактуры с начала текущего года"
-      illustration={<LottieAnimation src="/videos/documents.json" className="h-44 w-64" />}
+      illustration={<LottieAnimation src="/videos/documents.json" />}
     >
       <Card>
         <CardHeader title="Документы" />

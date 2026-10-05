@@ -24,7 +24,7 @@ export default function PaymentsPage() {
     <Page
       title="Платежи"
       description="Зачисления на лицевой счёт. Период — не более 90 дней."
-      illustration={<LottieAnimation src="/videos/payment.json" className="h-44 w-64" />}
+      illustration={<LottieAnimation src="/videos/payment.json" />}
     >
       <Card className="mb-4 p-4">
         <DateRange {...range} onChange={setRange} error={rangeError} presets={[7, 30, 90]} />

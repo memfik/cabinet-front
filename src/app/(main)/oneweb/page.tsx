@@ -32,7 +32,7 @@ export default function OneWebPage() {
     <Page
       title="OneWeb"
       description="Спутниковый интернет: тариф и остаток трафика"
-      illustration={<LottieAnimation src="/videos/satellite.json" className="h-44 w-64" />}
+      illustration={<LottieAnimation src="/videos/satellite.json" />}
     >
       {products.error ? (
         <Card>

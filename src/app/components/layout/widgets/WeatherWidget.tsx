@@ -57,6 +57,8 @@ export function WeatherWidget() {
       icon={CloudSun}
       onReload={reload}
       loading={loading && !data}
+      refreshing={loading && !!data}
+      staleError={!!error && !!data}
       error={error && !data ? "Не удалось загрузить погоду" : null}
     >
       {data && <WeatherBody forecast={data} />}

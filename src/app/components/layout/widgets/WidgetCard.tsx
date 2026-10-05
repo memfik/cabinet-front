@@ -11,6 +11,8 @@ export function WidgetCard({
   onReload,
   loading,
   error,
+  refreshing,
+  staleError,
   className,
   children,
 }: {
@@ -20,6 +22,10 @@ export function WidgetCard({
   /** Показываем скелетон, только пока данных ещё нет. */
   loading?: boolean
   error?: string | null
+  /** Идёт повторная загрузка при уже показанных данных: иконка крутится, кнопка заблокирована. */
+  refreshing?: boolean
+  /** Повторная загрузка не удалась, на экране прежние данные. */
+  staleError?: boolean
   className?: string
   children?: React.ReactNode
 }) {
@@ -33,10 +39,11 @@ export function WidgetCard({
         {onReload && (
           <button
             onClick={onReload}
+            disabled={refreshing}
             aria-label="Обновить"
-            className="text-muted-foreground hover:bg-muted/60 hover:text-foreground rounded-md p-1 transition-colors"
+            className="text-muted-foreground hover:bg-muted/60 hover:text-foreground rounded-md p-1 transition-colors disabled:pointer-events-none"
           >
-            <RefreshCw className="size-3.5" />
+            <RefreshCw className={cn("size-3.5", refreshing && "animate-spin")} />
           </button>
         )}
       </div>
@@ -49,7 +56,12 @@ export function WidgetCard({
           <Skeleton className="h-4 w-1/2" />
         </div>
       ) : (
-        children
+        <>
+          {children}
+          {staleError && !refreshing && (
+            <p className="text-destructive mt-3 text-[11px]">Не удалось обновить, показаны прежние данные</p>
+          )}
+        </>
       )}
     </section>
   )

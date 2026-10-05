@@ -19,6 +19,8 @@ export function AccountWidget() {
       icon={Wallet}
       onReload={reload}
       loading={loading && !data}
+      refreshing={loading && !!data}
+      staleError={!!error && !!data}
       error={error && !data ? "Не удалось загрузить данные" : null}
     >
       {data && !data.has_contract ? (

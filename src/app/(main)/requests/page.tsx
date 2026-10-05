@@ -53,7 +53,7 @@ export default function RequestsPage() {
     <Page
       title="Заявления"
       description="Запрос документов, изменение настроек и отключение услуг. Заявление уходит сотрудникам письмом."
-      illustration={<LottieAnimation src="/videos/application.json" className="h-44 w-64" />}
+      illustration={<LottieAnimation src="/videos/application.json" />}
     >
       {loading && !options ? (
         <Card className="space-y-4 p-6">

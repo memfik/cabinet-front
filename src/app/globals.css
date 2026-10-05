@@ -211,3 +211,17 @@ html[data-theme="dark"] body {
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-new(root) { animation: none; }
 }
+
+/* Волна по точкам логотипа: от центра к краям, затем пауза. */
+@keyframes logo-dot-wave {
+  0%, 55%, 100% { transform: scale(1); opacity: 1; }
+  25% { transform: scale(0.55); opacity: 0.45; }
+}
+.logo-dot {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: logo-dot-wave 5s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .logo-dot { animation: none; }
+}

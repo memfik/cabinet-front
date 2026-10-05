@@ -37,6 +37,8 @@ export function CurrencyWidget() {
       icon={Coins}
       onReload={reload}
       loading={loading && !data}
+      refreshing={loading && !!data}
+      staleError={!!error && !!data}
       error={error && !data ? "Не удалось загрузить курсы" : null}
     >
       {data && (

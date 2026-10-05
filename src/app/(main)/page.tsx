@@ -35,7 +35,8 @@ export default function Home() {
     <Page
       title={user?.first_name ? `Здравствуйте, ${user.first_name}!` : "Личный кабинет"}
       description="Сводка по вашему договору"
-      illustration={<LottieAnimation src="/videos/welcome.json" className="h-44 w-64" />}
+      illustration={<LottieAnimation src="/videos/welcome.json" />}
+      illustrationClassName="-my-8 h-52 w-72"
     >
       {error && !data ? (
         <Card>

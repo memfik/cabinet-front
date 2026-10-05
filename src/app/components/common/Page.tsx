@@ -6,6 +6,7 @@ export function Page({
   description,
   actions,
   illustration,
+  illustrationClassName,
   children,
   className,
 }: {
@@ -14,6 +15,8 @@ export function Page({
   actions?: React.ReactNode
   /** Декоративная картинка/анимация справа в плашке, только на широких экранах. */
   illustration?: React.ReactNode
+  /** Переопределяет размер контейнера иллюстрации (по умолчанию `h-40 w-56`). */
+  illustrationClassName?: string
   children: React.ReactNode
   className?: string
 }) {
@@ -23,12 +26,12 @@ export function Page({
         <div className="bg-brand/15 pointer-events-none absolute -top-16 -right-10 size-56 rounded-full blur-3xl" />
         <div className="pointer-events-none absolute -bottom-20 left-1/3 size-48 rounded-full bg-indigo-500/15 blur-3xl" />
         <div className="relative flex flex-wrap items-center justify-between gap-4">
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1 basis-72">
             <h1 className="text-3xl font-bold tracking-tight">{title}</h1>
             {description && <p className="text-muted-foreground mt-1.5 text-base">{description}</p>}
           </div>
           {actions && <div className="flex w-full shrink-0 flex-wrap items-center gap-2 sm:w-auto">{actions}</div>}
-          {illustration && <div className="pointer-events-none -my-6 hidden shrink-0 md:block">{illustration}</div>}
+          {illustration && <div className={cn("pointer-events-none -my-6 hidden h-40 w-56 shrink-0 md:block [&>*]:size-full", illustrationClassName)}>{illustration}</div>}
         </div>
       </div>
       {children}

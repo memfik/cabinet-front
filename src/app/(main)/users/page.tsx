@@ -6,7 +6,6 @@ import {Pencil, Plus, ShieldOff, Trash2} from "lucide-react"
 import {Button} from "@/components/ui/button"
 import {Input} from "@/components/ui/input"
 import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "@/components/ui/dialog"
-import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table"
 import {Page, Card} from "@/app/components/common/Page"
 import {EmptyState, ErrorState, ListSkeleton} from "@/app/components/common/States"
 import {Field} from "@/app/components/common/Field"
@@ -40,74 +39,32 @@ export default function UsersPage() {
         )
       }
     >
-      <Card>
-        {loading && !users ? (
-          <ListSkeleton />
-        ) : forbidden ? (
-          <EmptyState
-            icon={ShieldOff}
-            title="Нет доступа"
-            description="Управлять пользователями могут только менеджеры. Обратитесь к владельцу договора."
-          />
-        ) : error && !users ? (
-          <ErrorState error={error} onRetry={reload} />
-        ) : !users?.length ? (
-          <EmptyState
-            title="Пользователей пока нет"
-            description="Добавьте сотрудника, чтобы он мог входить в кабинет."
-          />
-        ) : (
-          <>
-            {/* Десктоп: таблица */}
-            <div className="hidden md:block">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="pl-5">Пользователь</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Должность</TableHead>
-                    <TableHead className="pr-5 text-right">Действия</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {users.map((u) => (
-                    <TableRow key={u.id}>
-                      <TableCell className="pl-5">
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium">{fullName(u)}</span>
-                          {u.is_user_manager && <Badge tone="brand">Менеджер</Badge>}
-                        </div>
-                      </TableCell>
-                      <TableCell>{u.email}</TableCell>
-                      <TableCell className="text-muted-foreground">{u.position ?? "—"}</TableCell>
-                      <TableCell className="pr-5">
-                        <RowActions user={u} onEdit={() => setEditing(u)} onDelete={() => setDeleting(u)} />
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-
-            {/* Мобильная раскладка: карточки */}
-            <div className="divide-border divide-y md:hidden">
-              {users.map((u) => (
-                <div key={u.id} className="flex items-start justify-between gap-3 px-5 py-4">
-                  <div className="min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-medium">{fullName(u)}</span>
-                      {u.is_user_manager && <Badge tone="brand">Менеджер</Badge>}
-                    </div>
-                    <p className="text-muted-foreground mt-0.5 truncate text-sm">{u.email}</p>
-                    {u.position && <p className="text-muted-foreground text-sm">{u.position}</p>}
-                  </div>
-                  <RowActions user={u} onEdit={() => setEditing(u)} onDelete={() => setDeleting(u)} />
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-      </Card>
+      {users?.length ? (
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          {users.map((u) => (
+            <UserCard key={u.id} user={u} onEdit={() => setEditing(u)} onDelete={() => setDeleting(u)} />
+          ))}
+        </div>
+      ) : (
+        <Card>
+          {loading && !users ? (
+            <ListSkeleton />
+          ) : forbidden ? (
+            <EmptyState
+              icon={ShieldOff}
+              title="Нет доступа"
+              description="Управлять пользователями могут только менеджеры. Обратитесь к владельцу договора."
+            />
+          ) : error && !users ? (
+            <ErrorState error={error} onRetry={reload} />
+          ) : (
+            <EmptyState
+              title="Пользователей пока нет"
+              description="Добавьте сотрудника, чтобы он мог входить в кабинет."
+            />
+          )}
+        </Card>
+      )}
 
       <UserDialog
         user={editing}
@@ -129,24 +86,48 @@ export default function UsersPage() {
   )
 }
 
+/** Карточка пользователя: аватар с инициалами, имя, должность и email. */
+function UserCard({user, onEdit, onDelete}: {user: User; onEdit: () => void; onDelete: () => void}) {
+  const name = fullName(user)
+  const initials = (name !== "—" ? name : user.email).split(/\s+/).slice(0, 2).map((w) => w[0]?.toUpperCase()).join("")
+
+  return (
+    <Card className="flex flex-col gap-3 p-5 shadow-sm">
+      <div className="flex items-start gap-3">
+        <div className="bg-brand/10 text-brand flex size-11 shrink-0 items-center justify-center rounded-full text-sm font-semibold">
+          {initials}
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="truncate font-semibold">{name !== "—" ? name : user.email}</p>
+          <p className="text-muted-foreground truncate text-sm">{user.position ?? "Должность не указана"}</p>
+        </div>
+      </div>
+      <div className="border-border flex flex-wrap items-center justify-between gap-2 border-t pt-3">
+        <span className="text-muted-foreground min-w-0 truncate text-sm">{user.email}</span>
+        {user.is_user_manager && <Badge tone="brand">Менеджер</Badge>}
+      </div>
+      <RowActions user={user} onEdit={onEdit} onDelete={onDelete} />
+    </Card>
+  )
+}
+
 /** Кнопки показываются по правам текущего пользователя на запись. */
 function RowActions({user, onEdit, onDelete}: {user: User; onEdit: () => void; onDelete: () => void}) {
+  if (!user.permissions.update && !user.permissions.delete) return null
   return (
-    <div className="flex justify-end gap-1">
+    <div className="flex gap-2">
       {user.permissions.update && (
-        <Button variant="ghost" size="icon" onClick={onEdit} aria-label="Изменить">
-          <Pencil />
+        <Button variant="outline" className="h-11 flex-1 text-[15px]" onClick={onEdit}>
+          <Pencil /> Изменить
         </Button>
       )}
       {user.permissions.delete && (
         <Button
-          variant="ghost"
-          size="icon"
-          className="text-destructive hover:text-destructive"
+          variant="outline"
+          className="text-destructive hover:text-destructive h-11 flex-1 text-[15px]"
           onClick={onDelete}
-          aria-label="Удалить"
         >
-          <Trash2 />
+          <Trash2 /> Удалить
         </Button>
       )}
     </div>
