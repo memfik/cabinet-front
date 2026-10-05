@@ -40,7 +40,7 @@ export default function TicketsPage() {
 
   return (
     <Page
-      title="Заявки"
+      title="Заявки (K-ticket)"
       description="Обращения по проблемам с услугами"
       actions={
         <Button

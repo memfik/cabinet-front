@@ -170,10 +170,16 @@ const staffMsg = (id: number, body: string, at: string) => ({
   subject: "Re: заявка",
   body,
   has_attachments: false,
+  attachments: [],
   from_staff: true,
 })
 
 const ticketMessages = new Map<number, TicketDetails["messages"]>()
+
+const mockAttachments = (form: FormData | null) => {
+  const files = (form?.getAll("attachments[]") ?? []).filter((f): f is File => f instanceof File)
+  return {has_attachments: files.length > 0, attachments: files.map((f, i) => ({id: Date.now() + i, name: f.name, size_kb: Math.round(f.size / 102.4) / 10, is_available: true}))}
+}
 
 function ticketDetails(t: Ticket): TicketDetails {
   if (!ticketMessages.has(t.id)) {
@@ -185,6 +191,11 @@ function ticketDetails(t: Ticket): TicketDetails {
         from_name: "Алексей Иванов",
         to_email: "support@example.kz",
         from_staff: false,
+        has_attachments: true,
+        attachments: [
+          {id: t.id * 10 + 1, name: "screenshot.png", size_kb: 214.5, is_available: true},
+          {id: t.id * 10 + 2, name: "dump-large.zip", size_kb: null, is_available: false},
+        ],
       },
     ])
   }
@@ -364,6 +375,8 @@ route("GET", "oneweb/products/{productId}/usage", ({params, query}) => {
     month: query.month ?? null,
     tariff_name: unlimited ? "OneWeb Unlimited" : "OneWeb 500 GB",
     is_unlimited: unlimited,
+    used: unlimited ? "842.7" : "187.6",
+    used_units: "GB",
     packages: unlimited
       ? []
       : [
@@ -421,9 +434,15 @@ route("POST", "tickets/{ticketId}/messages", ({params, form}) => {
   if (!message || !subject) fail(422, "Поле обязательно.", {...(subject ? {} : {subject: ["Поле тема обязательно."]}), ...(message ? {} : {message: ["Поле сообщение обязательно."]})})
   const msgs = ticketDetails(t!).messages
   const id = Date.now()
-  msgs.unshift({...staffMsg(id, `<p>${message.replace(/</g, "&lt;").replace(/\n/g, "<br>")}</p>`, daysAgo(0, new Date().getHours(), new Date().getMinutes())), subject, from_email: me.email, from_name: "Алексей Иванов", from_staff: false, has_attachments: (form?.getAll("attachments[]").length ?? 0) > 0})
+  msgs.unshift({...staffMsg(id, `<p>${message.replace(/</g, "&lt;").replace(/\n/g, "<br>")}</p>`, daysAgo(0, new Date().getHours(), new Date().getMinutes())), subject, from_email: me.email, from_name: "Алексей Иванов", from_staff: false, ...mockAttachments(form)})
   return {type: "ticket-messages", id}
 }, 201)
+
+route("GET", "tickets/{ticketId}/attachments/{attachmentId}", ({params}) => {
+  const found = ticketMessages.get(Number(params.ticketId))?.flatMap((x) => x.attachments).find((a) => String(a.id) === params.attachmentId)
+  if (!found?.is_available) fail(404, "Файл не найден.")
+  return new Blob([`mock: ${found!.name}`], {type: "application/octet-stream"})
+})
 
 route("GET", "requests/options", () => requestOptions)
 route("POST", "requests/document", ({body}) => {

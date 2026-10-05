@@ -112,8 +112,10 @@ export default function OneWebPage() {
             ) : usage.data.is_unlimited ? (
               <EmptyState
                 icon={InfinityIcon}
-                title="Безлимитный тариф"
-                description="Пакетов трафика нет — ограничений по объёму нет."
+                title={
+                  usage.data.used ? `Израсходовано: ${usage.data.used} ${usage.data.used_units ?? ""}`.trim() : "Безлимитный тариф"
+                }
+                description="Безлимитный тариф: ограничений по объёму нет."
               />
             ) : (
               <ul className={cn("divide-border divide-y transition-opacity", usage.loading && "opacity-60")}>

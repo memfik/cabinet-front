@@ -27,8 +27,12 @@ export interface OneWebUsage {
   month: string | null
   /** `null` — нет данных за период. */
   tariff_name: string | null
-  /** Безлимит — `packages` пуст. */
+  /** Безлимит — `packages` пуст, показываем только `used`. */
   is_unlimited: boolean
+  /** Израсходовано за период, число строкой. */
+  used: string | null
+  /** Единицы `used`, например `GB`. */
+  used_units: string | null
   packages: OneWebPackage[]
 }
 

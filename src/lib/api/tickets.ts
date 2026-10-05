@@ -1,4 +1,5 @@
 import {apiClient} from "./client"
+import {downloadFile} from "./files"
 import type {DateOnly, DateTime, Paginated} from "./types"
 
 export interface TicketStatus {
@@ -19,6 +20,15 @@ export interface Ticket {
   created_at: DateTime | null
 }
 
+export interface TicketAttachment {
+  /** Для `GET /tickets/{ticketId}/attachments/{attachmentId}`. */
+  id: number
+  name: string
+  size_kb: number | null
+  /** `false` — файл слишком большой и не сохранён: показываем имя без ссылки на скачивание. */
+  is_available: boolean
+}
+
 export interface TicketMessage {
   id: number
   sent_at: DateTime | null
@@ -30,6 +40,7 @@ export interface TicketMessage {
   /** HTML, очищенный на сервере — можно вставлять как HTML. */
   body: string
   has_attachments: boolean
+  attachments: TicketAttachment[]
   /** `true` — ответ сотрудника, `false` — сообщение клиента. */
   from_staff: boolean
 }
@@ -105,6 +116,10 @@ export const ticketsApi = {
   get: (ticketId: number) => apiClient.get<TicketDetails>(`tickets/${ticketId}`).then((r) => r.data),
 
   create: (payload: CreateTicketPayload) => apiClient.post<TicketDetails>("tickets", payload).then((r) => r.data),
+
+  /** Вложение письма: только для `is_available: true`, иначе 404. */
+  downloadAttachment: (ticketId: number, attachment: TicketAttachment) =>
+    downloadFile(`tickets/${ticketId}/attachments/${attachment.id}`, attachment.name),
 
   /** multipart/form-data — из-за файлов. Content-Type с boundary axios проставит сам. */
   sendMessage: (ticketId: number, {attachments, sender_name, ...rest}: SendTicketMessagePayload) => {

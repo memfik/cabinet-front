@@ -3,7 +3,7 @@
 import {useRef, useState} from "react"
 import Link from "next/link"
 import {useParams} from "next/navigation"
-import {ArrowLeft, Paperclip, X, SearchX} from "lucide-react"
+import {ArrowLeft, Download, Loader2, Paperclip, X, SearchX} from "lucide-react"
 import {toast} from "sonner"
 import {Button} from "@/components/ui/button"
 import {Input} from "@/components/ui/input"
@@ -12,7 +12,7 @@ import {Page, Card, CardHeader} from "@/app/components/common/Page"
 import {EmptyState, ErrorState, Skeleton} from "@/app/components/common/States"
 import {Field} from "@/app/components/common/Field"
 import {Badge} from "@/app/components/common/Badge"
-import {errFields, errMsg, errStatus, ticketsApi, type TicketDetails} from "@/lib/api"
+import {errFields, errMsg, errStatus, saveFile, ticketsApi, type TicketAttachment, type TicketDetails} from "@/lib/api"
 import {useApi} from "@/lib/hooks/useApi"
 import {useAuthStore} from "@/lib/stores/authStore"
 import {formatDateTime} from "@/lib/format"
@@ -24,6 +24,52 @@ const MAX_SIZE = 1953 * 1024
 const ALLOWED = "pdf jpg jpeg png gif txt csv doc docx xls xlsx odt ods zip rar 7z log".split(" ")
 
 const sizeLabel = (b: number) => (b >= 1024 * 1024 ? `${(b / 1024 / 1024).toFixed(1)} МБ` : `${Math.ceil(b / 1024)} КБ`)
+
+/** Вложения письма: доступные скачиваются с токеном, недоступные (слишком большие) показываются без ссылки. */
+function AttachmentList({ticketId, attachments}: {ticketId: number; attachments: TicketAttachment[]}) {
+  const [downloading, setDownloading] = useState<number | null>(null)
+
+  async function download(a: TicketAttachment) {
+    setDownloading(a.id)
+    try {
+      saveFile(await ticketsApi.downloadAttachment(ticketId, a))
+    } catch (e) {
+      toast.error(errMsg(e, "Не удалось скачать файл. Попробуйте позже."))
+    } finally {
+      setDownloading(null)
+    }
+  }
+
+  return (
+    <ul className="mt-2.5 flex flex-wrap gap-2">
+      {attachments.map((a) => (
+        <li key={a.id} className="max-w-full">
+          {a.is_available ? (
+            <button
+              type="button"
+              onClick={() => download(a)}
+              disabled={downloading === a.id}
+              className="border-border bg-background hover:bg-muted flex max-w-full items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs transition-colors disabled:opacity-60"
+            >
+              {downloading === a.id ? <Loader2 className="size-3.5 animate-spin" /> : <Download className="size-3.5" />}
+              <span className="truncate">{a.name}</span>
+              {a.size_kb != null && <span className="text-muted-foreground shrink-0">{sizeLabel(a.size_kb * 1024)}</span>}
+            </button>
+          ) : (
+            <span
+              title="Файл слишком большой и не сохранён"
+              className="border-border text-muted-foreground flex max-w-full items-center gap-1.5 rounded-lg border border-dashed px-2.5 py-1.5 text-xs"
+            >
+              <Paperclip className="size-3.5" />
+              <span className="truncate">{a.name}</span>
+              <span className="shrink-0">· не сохранён</span>
+            </span>
+          )}
+        </li>
+      ))}
+    </ul>
+  )
+}
 
 /** Заявка: реквизиты, описание, переписка и форма ответа. */
 export default function TicketPage() {
@@ -117,6 +163,7 @@ export default function TicketPage() {
                         className="[&_a]:text-brand text-sm break-words [&_a]:underline [&_p]:mb-2 [&_p:last-child]:mb-0 [&_ul]:list-disc [&_ul]:pl-5"
                         dangerouslySetInnerHTML={{__html: m.body}}
                       />
+                      {m.attachments.length > 0 && <AttachmentList ticketId={ticket.id} attachments={m.attachments} />}
                     </div>
                   </li>
                 ))}
