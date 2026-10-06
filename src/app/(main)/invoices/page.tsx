@@ -3,7 +3,7 @@
 import {useState} from "react"
 import {Download, FileText, Loader2} from "lucide-react"
 import {toast} from "sonner"
-import {Page, Card, CardHeader} from "@/app/components/common/Page"
+import {Page, Card} from "@/app/components/common/Page"
 import {LottieAnimation} from "@/app/components/common/LottieAnimation"
 import {Badge, type Tone} from "@/app/components/common/Badge"
 import {EmptyState, ErrorState, ListSkeleton} from "@/app/components/common/States"
@@ -62,7 +62,6 @@ export default function InvoicesPage() {
       illustration={<LottieAnimation src="/videos/documents.json" />}
     >
       <Card>
-        <CardHeader title={t("invoices.title")} />
         {error ? (
           <ErrorState error={error} onRetry={reload} />
         ) : loading && !data ? (
