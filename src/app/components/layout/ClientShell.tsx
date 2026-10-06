@@ -21,7 +21,7 @@ export function ClientShell({children}: {children: React.ReactNode}) {
   }, [])
 
   return (
-    <div className="flex h-screen bg-neutral-100 dark:bg-neutral-950">
+    <div className="relative flex h-screen overflow-hidden app-bg">
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <div className="shrink-0 lg:hidden">

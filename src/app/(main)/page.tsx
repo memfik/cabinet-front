@@ -95,9 +95,9 @@ export default function Home() {
               <Link
                 key={href}
                 href={href}
-                className="bg-card border-border hover:border-brand/40 group flex items-center gap-3 rounded-xl border p-4 transition-colors"
+                className="glass hover:border-brand/40 group flex items-center gap-3 rounded-xl border p-4 transition-colors"
               >
-                <span className="bg-brand/10 text-brand flex size-10 shrink-0 items-center justify-center rounded-lg">
+                <span className="bg-brand/10 text-brand dark:bg-brand/25 flex size-10 shrink-0 items-center justify-center rounded-lg dark:text-blue-300">
                   <Icon className="size-5" />
                 </span>
                 <span className="flex-1 text-sm font-medium">{t(label)}</span>
@@ -116,7 +116,7 @@ function BalanceCard({balance, account}: {balance: string | null; account: strin
   const {t} = useI18n()
   const debt = isNegative(balance)
   return (
-    <Card className="bg-brand border-transparent p-5 text-white">
+    <div className="bg-brand shadow-brand/30 rounded-xl p-5 text-white shadow-lg">
       <div className="flex items-center justify-between text-sm text-white/80">
         <span>{debt ? t("home.debt") : t("home.balance")}</span>
         <Wallet className="size-5" />
@@ -130,7 +130,7 @@ function BalanceCard({balance, account}: {balance: string | null; account: strin
       >
         {t("home.linkPayments")} <ArrowRight className="size-3.5" />
       </Link>
-    </Card>
+    </div>
   )
 }
 
@@ -153,7 +153,7 @@ function ServiceRow({service}: {service: DashboardService}) {
   const {label, icon: Icon} = categories[service.category]
   return (
     <li className="flex flex-wrap items-center gap-x-4 gap-y-2 px-5 py-4">
-      <span className="bg-brand/10 text-brand flex size-10 shrink-0 items-center justify-center rounded-lg">
+      <span className="bg-brand/10 text-brand dark:bg-brand/25 flex size-10 shrink-0 items-center justify-center rounded-lg dark:text-blue-300">
         <Icon className="size-5" />
       </span>
       <div className="min-w-0 flex-1 basis-56">

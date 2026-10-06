@@ -6,9 +6,9 @@ import {Page, Card, CardHeader} from "@/app/components/common/Page"
 import {LottieAnimation} from "@/app/components/common/LottieAnimation"
 import {Badge} from "@/app/components/common/Badge"
 import {EmptyState, ErrorState, Skeleton} from "@/app/components/common/States"
+import {MonthPicker} from "@/app/components/common/MonthPicker"
 import {Field} from "@/app/components/common/Field"
 import {Button} from "@/components/ui/button"
-import {Input} from "@/components/ui/input"
 import {oneWebApi, type OneWebPackage} from "@/lib/api/oneweb"
 import {useApi} from "@/lib/hooks/useApi"
 import {formatDateTime, toDateInput} from "@/lib/format"
@@ -78,12 +78,11 @@ export default function OneWebPage() {
             </Field>
             <Field label={t("oneweb.period")}>
               <div className="flex items-center gap-2">
-                <Input
-                  type="month"
+                <MonthPicker
                   value={month}
                   max={toDateInput(new Date()).slice(0, 7)}
-                  onChange={(e) => setMonth(e.target.value)}
-                  className="h-11 w-full md:w-48"
+                  onChange={setMonth}
+                  className="md:w-48"
                 />
                 <Button
                   variant={month ? "outline" : "secondary"}

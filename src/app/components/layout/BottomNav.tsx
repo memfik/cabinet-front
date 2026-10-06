@@ -28,7 +28,7 @@ export function BottomNav() {
   const overflowActive = overflow.some((i) => isNavActive(pathname, i.href))
 
   return (
-    <nav className="bg-card border-border relative z-40 shrink-0 rounded-t-3xl border-t pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_16px_-8px_rgb(0_0_0/0.15)] lg:hidden">
+    <nav className="glass relative z-40 shrink-0 rounded-t-3xl border-t pb-[env(safe-area-inset-bottom)] lg:hidden">
       <div className="flex">
         {visible.map((item) => {
           const Icon = item.icon

@@ -56,8 +56,10 @@ export function UserMenu({variant = "header"}: {variant?: "header" | "rail"}) {
           <button
             suppressHydrationWarning
             className={cn(
-              "hover:bg-muted/50 flex items-center gap-2 rounded-md px-1.5 py-1 transition-colors md:px-2",
-              rail && "border-border bg-muted/40 hover:bg-muted/70 w-full gap-3 rounded-xl border p-2 md:px-2"
+              "flex items-center gap-2 rounded-lg transition-colors",
+              rail
+                ? "border-foreground/15 w-full gap-3 rounded-xl border bg-white/60 p-2 shadow-xs hover:bg-white/80 dark:bg-white/10 dark:hover:bg-white/15"
+                : "md:border-foreground/15 md:border md:bg-white/60 md:px-2 md:py-1 md:shadow-xs md:hover:bg-white/80 md:dark:bg-white/10 md:dark:hover:bg-white/15"
             )}
           />
         }

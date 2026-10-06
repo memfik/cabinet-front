@@ -22,13 +22,14 @@ export function Page({
 }) {
   return (
     <div className={cn("px-4 py-6 md:px-6 md:py-8 lg:pt-3", className)}>
-      <div className="from-brand/15 via-brand/5 bg-card border-border relative mb-6 overflow-hidden rounded-2xl border bg-linear-to-br to-indigo-500/10 p-5 shadow-md md:px-8 md:py-8">
+      <div className="glass relative mb-6 overflow-hidden rounded-2xl border p-5 md:px-8 md:py-8">
+        <div className="from-brand/25 via-brand/10 dark:from-brand/40 dark:via-brand/15 pointer-events-none absolute inset-0 bg-linear-to-br to-indigo-500/15 dark:to-indigo-500/20" />
         <div className="bg-brand/15 pointer-events-none absolute -top-16 -right-10 size-56 rounded-full blur-3xl" />
         <div className="pointer-events-none absolute -bottom-20 left-1/3 size-48 rounded-full bg-indigo-500/15 blur-3xl" />
         <div className="relative flex flex-wrap items-center justify-between gap-4">
           <div className="min-w-0 flex-1 basis-72">
             <h1 className="text-3xl font-bold tracking-tight">{title}</h1>
-            {description && <p className="text-muted-foreground mt-1.5 text-base">{description}</p>}
+            {description && <p className="text-foreground/70 mt-1.5 text-base">{description}</p>}
           </div>
           {actions && <div className="flex w-full shrink-0 flex-wrap items-center gap-2 sm:w-auto">{actions}</div>}
           {illustration && (
@@ -50,7 +51,7 @@ export function Page({
 
 /** Белая карточка-секция. */
 export function Card({className, ...props}: React.ComponentProps<"div">) {
-  return <div className={cn("bg-card border-border rounded-xl border", className)} {...props} />
+  return <div className={cn("glass rounded-xl border", className)} {...props} />
 }
 
 export function CardHeader({title, actions}: {title: React.ReactNode; actions?: React.ReactNode}) {

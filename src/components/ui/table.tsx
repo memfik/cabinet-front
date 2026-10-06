@@ -13,7 +13,7 @@ function Table({className, ...props}: React.ComponentProps<"table">) {
 }
 
 function TableHeader({className, ...props}: React.ComponentProps<"thead">) {
-  return <thead data-slot="table-header" className={cn("bg-muted/50 [&_tr]:border-b [&_tr]:hover:bg-transparent", className)} {...props} />
+  return <thead data-slot="table-header" className={cn("[&_th]:bg-muted/50 [&_tr]:border-b [&_tr]:hover:bg-transparent [&_th:first-child]:rounded-tl-[calc(var(--radius-xl)-1px)] [&_th:last-child]:rounded-tr-[calc(var(--radius-xl)-1px)]", className)} {...props} />
 }
 
 function TableBody({className, ...props}: React.ComponentProps<"tbody">) {

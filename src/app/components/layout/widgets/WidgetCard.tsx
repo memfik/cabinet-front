@@ -32,7 +32,7 @@ export function WidgetCard({
 }) {
   const {t} = useI18n()
   return (
-    <section className={cn("bg-card border-border shrink-0 rounded-2xl border p-4 shadow-md", className)}>
+    <section className={cn("glass shrink-0 rounded-2xl border p-4", className)}>
       <div className="mb-3 flex items-center justify-between gap-2">
         <h2 className="text-muted-foreground flex items-center gap-2 text-sm font-semibold">
           <Icon className="size-4.5" />

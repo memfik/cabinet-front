@@ -28,7 +28,7 @@ function DialogOverlay({className, ...props}: DialogPrimitive.Backdrop.Props) {
     <DialogPrimitive.Backdrop
       data-slot="dialog-overlay"
       className={cn(
-        "data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0 fixed inset-0 isolate z-50 bg-black/10 duration-100 supports-backdrop-filter:backdrop-blur-xs",
+        "data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0 fixed inset-0 isolate z-50 bg-black/25 duration-100 supports-backdrop-filter:backdrop-blur-sm",
         className
       )}
       {...props}
@@ -51,7 +51,7 @@ function DialogContent({
         data-slot="dialog-content"
         className={cn(
           // на мобилке (<640px) все диалоги разворачиваются на весь экран
-          "bg-popover text-popover-foreground ring-foreground/10 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl p-4 text-sm ring-1 duration-100 outline-none sm:max-w-sm max-sm:top-0 max-sm:left-0 max-sm:flex max-sm:h-dvh max-sm:max-h-dvh max-sm:w-screen max-sm:max-w-full max-sm:translate-x-0 max-sm:translate-y-0 max-sm:flex-col max-sm:overflow-y-auto max-sm:rounded-none",
+          "bg-popover/75 text-popover-foreground ring-foreground/10 bg-linear-to-b from-white/50 to-transparent shadow-2xl backdrop-blur-2xl dark:from-white/10 backdrop-saturate-150 dark:ring-white/10 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-5 rounded-3xl p-6 text-sm ring-1 duration-100 outline-none sm:max-w-sm max-sm:top-0 max-sm:left-0 max-sm:flex max-sm:h-dvh max-sm:max-h-dvh max-sm:w-screen max-sm:max-w-full max-sm:translate-x-0 max-sm:translate-y-0 max-sm:flex-col max-sm:overflow-y-auto max-sm:rounded-none",
           className
         )}
         {...props}
@@ -60,7 +60,7 @@ function DialogContent({
         {showCloseButton && (
           <DialogPrimitive.Close
             data-slot="dialog-close"
-            render={<Button variant="ghost" className="absolute top-2 right-2" size="icon-sm" />}
+            render={<Button variant="ghost" className="text-muted-foreground hover:text-foreground absolute top-4 right-4 rounded-full" size="icon-sm" />}
           >
             <XIcon />
             <span className="sr-only">Close</span>
@@ -72,7 +72,7 @@ function DialogContent({
 }
 
 function DialogHeader({className, ...props}: React.ComponentProps<"div">) {
-  return <div data-slot="dialog-header" className={cn("flex flex-col gap-2", className)} {...props} />
+  return <div data-slot="dialog-header" className={cn("flex flex-col gap-1.5 pr-8", className)} {...props} />
 }
 
 function DialogFooter({
@@ -88,7 +88,7 @@ function DialogFooter({
       data-slot="dialog-footer"
       className={cn(
         // кнопки в футере диалога всегда крупные: 40px на десктопе, 48px на мобилке
-        "bg-muted/50 -mx-4 -mb-4 flex flex-col-reverse gap-2 rounded-b-xl border-t p-4 sm:flex-row sm:justify-end max-sm:mt-auto max-sm:rounded-b-none max-sm:pb-[calc(1rem+env(safe-area-inset-bottom))] [&>button]:h-10 [&>button]:px-5 [&>button]:text-sm max-sm:[&>button]:h-12 max-sm:[&>button]:text-[15px]",
+        "bg-foreground/5 -mx-6 -mb-6 flex flex-col-reverse gap-2 rounded-b-3xl border-t border-foreground/10 px-6 py-4 sm:flex-row sm:justify-end max-sm:mt-auto max-sm:rounded-b-none max-sm:pb-[calc(1rem+env(safe-area-inset-bottom))] [&>button]:h-10 [&>button]:rounded-xl [&>button]:px-5 [&>button]:text-sm max-sm:[&>button]:h-12 max-sm:[&>button]:text-[15px]",
         className
       )}
       {...props}
@@ -103,7 +103,7 @@ function DialogTitle({className, ...props}: DialogPrimitive.Title.Props) {
   return (
     <DialogPrimitive.Title
       data-slot="dialog-title"
-      className={cn("font-heading text-base leading-none font-medium", className)}
+      className={cn("font-heading text-xl leading-tight font-semibold tracking-tight", className)}
       {...props}
     />
   )

@@ -288,7 +288,7 @@ function SettingsForm({options}: {options: RequestFormOptions}) {
           <h3 className="mb-2 flex items-center gap-2 text-sm font-medium">
             <Phone className="text-muted-foreground size-4" /> {t("requests.phoneOptions")}
           </h3>
-          <div className="border-border divide-border divide-y rounded-lg border">
+          <div className="border-foreground/10 divide-foreground/10 divide-y overflow-hidden rounded-xl border bg-white/30 dark:bg-white/5">
             {options.phone_options.map((o) => (
               <div key={o.value} className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3">
                 <div className="flex min-w-0 items-center gap-2 text-sm">
@@ -322,23 +322,33 @@ function SettingsForm({options}: {options: RequestFormOptions}) {
 
 /** Переключатель из 2–3 вариантов в одну строку («Не менять / Открыть / Закрыть»). */
 function Segmented({value, onChange, options}: {value: string; onChange: (v: string) => void; options: Option[]}) {
+  // выбранное значение подсвечиваем по смыслу: «открыть» — зелёным, «закрыть» — красным
+  const activeTone: Record<string, string> = {
+    "": "bg-white text-foreground shadow-sm dark:bg-white/15",
+    open: "bg-emerald-500 text-white shadow-sm shadow-emerald-500/30",
+    close: "bg-rose-500 text-white shadow-sm shadow-rose-500/30",
+  }
   return (
-    <div className="bg-muted inline-flex rounded-lg p-0.5">
-      {options.map((o) => (
-        <button
-          key={o.value}
-          type="button"
-          onClick={() => onChange(o.value)}
-          className={cn(
-            "rounded-md px-3 py-1 text-xs font-medium transition-colors",
-            value === o.value
-              ? "bg-background text-foreground shadow-sm"
-              : "text-muted-foreground hover:text-foreground"
-          )}
-        >
-          {o.label}
-        </button>
-      ))}
+    <div className="bg-foreground/5 ring-foreground/10 inline-flex gap-0.5 rounded-xl p-1 ring-1 dark:bg-white/5">
+      {options.map((o) => {
+        const active = value === o.value
+        return (
+          <button
+            key={o.value}
+            type="button"
+            aria-pressed={active}
+            onClick={() => onChange(o.value)}
+            className={cn(
+              "h-8 rounded-lg px-3.5 text-[13px] font-medium transition-all",
+              active
+                ? (activeTone[o.value] ?? activeTone[""])
+                : "text-muted-foreground hover:bg-foreground/5 hover:text-foreground"
+            )}
+          >
+            {o.label}
+          </button>
+        )
+      })}
     </div>
   )
 }

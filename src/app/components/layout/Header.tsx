@@ -18,7 +18,7 @@ export function Header() {
   const items = navItems.filter((i) => !i.managerOnly || isManager)
 
   return (
-    <header className="bg-card border-border border-b">
+    <header className="glass border-b">
       <div className="grid h-16 grid-cols-[1fr_auto_minmax(0,1fr)] items-center gap-3 px-4 md:px-16">
         <Link href="/" className="col-start-1 flex shrink-0 items-center gap-2.5 justify-self-start">
           <img src="/icon.svg" alt={t("shell.logoAlt")} className="size-10" />
@@ -36,7 +36,7 @@ export function Header() {
                 className={cn(
                   "flex h-10 items-center gap-2 rounded-lg px-3 text-sm transition-colors",
                   active
-                    ? "bg-brand/10 text-brand font-semibold"
+                    ? "bg-brand/10 text-brand dark:bg-brand/25 font-semibold dark:text-blue-300"
                     : "text-foreground/80 hover:bg-muted/50 hover:text-foreground font-medium"
                 )}
               >

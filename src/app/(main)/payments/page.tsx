@@ -2,7 +2,7 @@
 
 import {useState} from "react"
 import {Wallet} from "lucide-react"
-import {Page, Card, CardHeader} from "@/app/components/common/Page"
+import {Page, Card} from "@/app/components/common/Page"
 import {LottieAnimation} from "@/app/components/common/LottieAnimation"
 import {DateRange} from "@/app/components/common/DateRange"
 import {EmptyState, ErrorState, ListSkeleton} from "@/app/components/common/States"
@@ -33,17 +33,6 @@ export default function PaymentsPage() {
       </Card>
 
       <Card>
-        <CardHeader
-          title={t("payments.credits")}
-          actions={
-            data && (
-              <span className="text-sm">
-                <span className="text-muted-foreground">{t("payments.total")}</span>
-                <span className="font-semibold tabular-nums">{formatMoney(data.total)}</span>
-              </span>
-            )
-          }
-        />
         {error && !rangeError ? (
           <ErrorState error={error} onRetry={reload} />
         ) : loading && !data ? (
@@ -98,6 +87,10 @@ export default function PaymentsPage() {
                 </li>
               ))}
             </ul>
+            <div className="border-border flex items-center justify-between gap-3 border-t px-5 py-3.5 text-sm">
+              <span className="text-muted-foreground">{t("payments.total")}</span>
+              <span className="text-base font-semibold tabular-nums">{formatMoney(data.total)}</span>
+            </div>
           </div>
         )}
       </Card>

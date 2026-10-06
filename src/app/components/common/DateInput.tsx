@@ -57,7 +57,7 @@ function toValue(text: string, withTime: boolean): string {
 }
 
 /** Месяц/год в шапке календаря — наш Select вместо нативного `<select>`. */
-function CaptionSelect({options, value, onChange, disabled}: DropdownProps) {
+export function CaptionSelect({options, value, onChange, disabled}: DropdownProps) {
   const current = options?.find((o) => o.value === value)
   return (
     <Select
@@ -79,10 +79,16 @@ function CaptionSelect({options, value, onChange, disabled}: DropdownProps) {
   )
 }
 
-const dateLocales: Record<Locale, typeof ru> = {ru, en: enUS, kk}
+/** Цвета DayPicker под бренд. */
+export const rdpStyle = {
+  "--rdp-accent-color": "var(--brand)",
+  "--rdp-accent-background-color": "color-mix(in oklab, var(--brand) 15%, transparent)",
+} as CSSProperties
+
+export const dateLocales: Record<Locale, typeof ru> = {ru, en: enUS, kk}
 
 /** `YYYY-MM-DD` → Date в локальной зоне (`new Date("YYYY-MM-DD")` дал бы UTC и сдвиг на день). */
-const parseDay = (v: string | undefined) => {
+export const parseDay = (v: string | undefined) => {
   const m = v?.match(/^(\d{4})-(\d{2})-(\d{2})/)
   return m ? new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])) : undefined
 }
@@ -147,12 +153,7 @@ function MaskedInput({withTime, value, onChange, min, max, className, ...rest}: 
             defaultMonth={parseDay(value) ?? parseDay(max) ?? new Date()}
             onSelect={pickDay}
             disabled={[...(min ? [{before: parseDay(min)!}] : []), ...(max ? [{after: parseDay(max)!}] : [])]}
-            style={
-              {
-                "--rdp-accent-color": "var(--brand)",
-                "--rdp-accent-background-color": "color-mix(in oklab, var(--brand) 15%, transparent)",
-              } as CSSProperties
-            }
+            style={rdpStyle}
           />
         </PopoverContent>
       </Popover>

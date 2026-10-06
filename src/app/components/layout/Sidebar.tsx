@@ -20,7 +20,7 @@ export function Sidebar() {
   const items = navItems.filter((i) => !i.managerOnly || isManager)
 
   return (
-    <aside className="bg-card border-border my-3 ml-3 hidden w-56 shrink-0 flex-col rounded-2xl border py-3 shadow-md lg:flex">
+    <aside className="glass my-3 ml-3 hidden w-56 shrink-0 flex-col rounded-2xl border py-3 lg:flex">
       <Link href="/" className="mx-4 mb-3 flex shrink-0 items-center gap-2.5" aria-label="Cabinet">
         <img src="/icon.svg" alt={t("shell.logoAlt")} className="size-10" />
         <span className="text-xl font-semibold">Cabinet</span>
@@ -37,7 +37,9 @@ export function Sidebar() {
               aria-current={active ? "page" : undefined}
               className={cn(
                 "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
-                active ? "bg-brand/10 text-brand" : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                active
+                  ? "bg-brand/10 text-brand dark:bg-brand/25 dark:text-blue-300"
+                  : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
               )}
             >
               <Icon className="size-5.5 shrink-0" />

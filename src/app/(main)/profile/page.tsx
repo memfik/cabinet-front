@@ -7,6 +7,7 @@ import {Button} from "@/components/ui/button"
 import {Input} from "@/components/ui/input"
 import {Page, Card, CardHeader} from "@/app/components/common/Page"
 import {Field} from "@/app/components/common/Field"
+import {LottieAnimation} from "@/app/components/common/LottieAnimation"
 import {ErrorBanner, NO_ERROR, firstError, handleFormError, type FormError} from "@/app/components/common/formError"
 import {useI18n, type MessageKey} from "@/i18n"
 import {authApi} from "@/lib/api/auth"
@@ -32,7 +33,7 @@ export default function ProfilePage() {
   ]
 
   return (
-    <Page title={t("profile.title")}>
+    <Page title={t("profile.title")} illustration={<LottieAnimation src="/videos/profile.json" />}>
       <div className="space-y-6">
         <Card>
           <CardHeader title={t("profile.userData")} />
