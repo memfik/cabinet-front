@@ -14,6 +14,7 @@ export default defineNamespace({
   retryAfter: {ru: "Повторите через {sec} сек.", en: "Try again in {sec} s.", kk: "{sec} сек. кейін қайталап көріңіз."},
   select: {ru: "Выберите…", en: "Select…", kk: "Таңдаңыз…"},
   daysShort: {ru: "{n} дн.", en: "{n} d.", kk: "{n} күн"},
+  calendar: {ru: "Календарь", en: "Calendar", kk: "Күнтізбе"},
   dateFrom: {ru: "С", en: "From", kk: "Бастап"},
   dateTo: {ru: "По", en: "To", kk: "Дейін"},
   pageRange: {ru: "{from}–{to} из {total}", en: "{from}–{to} of {total}", kk: "{from}–{to} / {total}"},

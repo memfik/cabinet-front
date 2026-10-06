@@ -11,6 +11,7 @@ import {Textarea} from "@/components/ui/textarea"
 import {Page, Card, CardHeader} from "@/app/components/common/Page"
 import {ErrorState, Skeleton} from "@/app/components/common/States"
 import {Field, SelectField} from "@/app/components/common/Field"
+import {DateTimeInput} from "@/app/components/common/DateInput"
 import {errFields, errMsg, errStatus, ticketsApi} from "@/lib/api"
 import {useApi} from "@/lib/hooks/useApi"
 import {useAuthStore} from "@/lib/stores/authStore"
@@ -214,20 +215,18 @@ export default function NewTicketPage() {
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field label={t("tickets.fieldDetectedAt")} required error={err("detected_at")}>
-                  <Input
-                    type="datetime-local"
+                  <DateTimeInput
                     value={form.detected_at}
                     max={nowLocal()}
-                    onChange={(e) => set("detected_at")(e.target.value)}
+                    onChange={set("detected_at")}
                     aria-invalid={!!err("detected_at")}
                   />
                 </Field>
                 <Field label={t("tickets.fieldDowntimeStart")} error={err("downtime_started_at")}>
-                  <Input
-                    type="datetime-local"
+                  <DateTimeInput
                     value={form.downtime_started_at}
                     max={nowLocal()}
-                    onChange={(e) => set("downtime_started_at")(e.target.value)}
+                    onChange={set("downtime_started_at")}
                   />
                 </Field>
               </div>

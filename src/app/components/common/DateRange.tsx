@@ -1,6 +1,6 @@
 "use client"
 
-import {Input} from "@/components/ui/input"
+import {DateInput} from "./DateInput"
 import {daysAgoInput, toDateInput} from "@/lib/format"
 import {cn} from "@/lib/utils"
 import {Field} from "./Field"
@@ -56,21 +56,19 @@ export function DateRange({
 
       <div className="grid grid-cols-2 gap-3 sm:flex sm:items-end sm:gap-2">
         <Field label={t("common.dateFrom")}>
-          <Input
-            type="date"
+          <DateInput
             value={from}
             max={to || undefined}
-            onChange={(e) => onChange({from: e.target.value, to})}
+            onChange={(v) => onChange({from: v, to})}
             className="h-11 w-full min-w-0 sm:w-44"
           />
         </Field>
         <span className="text-muted-foreground hidden h-11 items-center sm:flex">—</span>
         <Field label={t("common.dateTo")}>
-          <Input
-            type="date"
+          <DateInput
             value={to}
             min={from || undefined}
-            onChange={(e) => onChange({from, to: e.target.value})}
+            onChange={(v) => onChange({from, to: v})}
             className="h-11 w-full min-w-0 sm:w-44"
           />
         </Field>
